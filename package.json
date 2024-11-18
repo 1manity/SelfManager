@@ -1,0 +1,11 @@
+{
+  "name": "self-manager",
+  "version": "1.0.0",
+  "scripts": {
+    "start:frontend": "pnpm --filter frontend start",
+    "start:backend": "pnpm --filter backend start"
+  },
+  "dependencies": {
+  },
+  "workspaces": ["packages/*"]
+}
