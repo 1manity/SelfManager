@@ -34,5 +34,8 @@ export default [
         { allowConstantExport: true },
       ],
     },
+    linterOptions: {
+      reportUnusedDisableDirectives: true, // 将该选项移动到这里
+    },
   },
-]
+];

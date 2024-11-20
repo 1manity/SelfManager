@@ -50,8 +50,8 @@ router.delete('/:id', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const user = await UserService.verifyUser(username, password);
-    if (!user) return res.status(401).json({ error: 'Invalid username or password' });
-    res.json({ message: 'Login successful', user });
+    if (!user) return res.status(401).json({ code: 401, error: 'Invalid username or password' });
+    res.json({ code: 200, message: 'Login successful' });
 });
 
 module.exports = router;
