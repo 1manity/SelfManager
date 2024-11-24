@@ -5,9 +5,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import {login} from "@/api/user/auth.js";
+import {useToast} from "@/hooks/use-toast.js";
+import {ToastAction} from "@/components/ui/toast.jsx";
 
 export default function Login() {
     const navigate = useNavigate()
+    const { toast } = useToast()
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
 
@@ -17,9 +20,29 @@ export default function Login() {
         console.log("Login submitted")
         // 登录成功后导航到主页
         // navigate("/")
-        const result = await login(username, password).then(res => {
-            console.log(res.data)
-        })
+        try {
+            const result = await login(username, password).then(res => {
+                console.log(res)
+                if (res.code === 200) {
+                    navigate("/dashboard")
+                    toast({
+                        title: "登录成功😀",
+                    })
+                }
+                // throw res
+            })
+        } catch (e) {
+            console.log(e)
+            if(e.code === 'ERR_BAD_REQUEST')
+                toast({
+                    title: '用户名或密码错误🤨',
+                })
+            else
+                toast({
+                    title: '未知错误🤨',
+                })
+        }
+
     }
 
     return (
@@ -59,6 +82,7 @@ export default function Login() {
                             <Button type="submit" className={"w-full mt-4"}>
                                 登录
                             </Button>
+
                         </div>
 
                     </form>

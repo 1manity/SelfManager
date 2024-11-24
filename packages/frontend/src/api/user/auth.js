@@ -8,7 +8,7 @@ export const login = async (username, password) => {
             username,
             password,
         });
-        console.log("TEST",response.data.token)
+        // console.log("TEST",response.data.token)
         localStorage.setItem('token', response.data.token)
         return response; // 返回登录成功后的数据
     } catch (error) {
