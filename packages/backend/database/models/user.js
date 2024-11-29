@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
     User.associate = function (models) {
         User.hasMany(models.Task, {
             foreignKey: 'userId',
-            as: 'tasks', // 可以通过 `tasks` 访问该用户的所有任务
+            // as: 'tasks', // 可以通过 `tasks` 访问该用户的所有任务
         });
     };
     return User;
