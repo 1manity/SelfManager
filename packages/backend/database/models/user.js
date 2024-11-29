@@ -40,6 +40,12 @@ module.exports = (sequelize, DataTypes) => {
             }
         }
     );
-
+    // 关联任务：一个用户有多个任务
+    User.associate = function (models) {
+        User.hasMany(models.Task, {
+            foreignKey: 'userId',
+            as: 'tasks', // 可以通过 `tasks` 访问该用户的所有任务
+        });
+    };
     return User;
 };
