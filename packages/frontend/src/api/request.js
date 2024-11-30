@@ -1,5 +1,6 @@
 // src/api/axiosInstance.js
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // 创建 Axios 实例
 const request = axios.create({
@@ -29,6 +30,7 @@ request.interceptors.response.use(
         if (error.response?.status === 401) {
             console.error('Unauthorized! Redirecting to login...');
             // 可以在这里处理登出逻辑，比如重定向到登录页
+            window.location.href = '/login'; /** NEED TO REFACTOR */
         }
         return Promise.reject(error);
     }
