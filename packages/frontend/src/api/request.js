@@ -25,15 +25,24 @@ request.interceptors.request.use(
 
 // 响应拦截器
 request.interceptors.response.use(
-    (response) => response.data, // 直接返回响应数据
+    (response) => {
+        const { code, message, data } = response.data;
+        
+        // 统一处理成功响应
+        if (code === 200) {
+            return { code, message, data };  // 只返回必要的数据
+        } else {
+            return Promise.reject(new Error(message || 'Unknown error'));
+        }
+    },
     (error) => {
         if (error.response?.status === 401) {
             console.error('Unauthorized! Redirecting to login...');
-            // 可以在这里处理登出逻辑，比如重定向到登录页
             window.location.href = '/login'; /** NEED TO REFACTOR */
         }
-        return Promise.reject(error);
+        return Promise.reject(error); // 返回 Promise.reject 保证错误被抛出
     }
 );
+
 
 export default request;

@@ -13,22 +13,31 @@ export default function Task() {
     const [newTask, setNewTask] = useState({ title: "", description: "", dueDate: "" })
 
     useEffect(() => {
-        fetchTasks()
-      }, [])
-    
-      const fetchTasks = async () => {
+        fetchTasks();
+    }, []);
+
+    const fetchTasks = async () => {
         try {
-          const data = await getAllTask()
-          setTasks(data)
+            const { code, message, data } = await getAllTask();  // 直接获取结构化的 { code, message, data }
+            if (code === 200) {
+                setTasks(data); // 假设任务数据存储在 data 中
+            } else {
+                console.error(message); // 如果没有成功，打印错误消息
+            }
         } catch (error) {
-          console.error("Error fetching tasks:", error)
+            console.error("Error fetching tasks:", error);
         }
-      }
+    }
+
     // 创建任务
     const handleCreateTask = async () => {
         try {
-            const createdTask = await createNewTask(newTask);
-            setTasks([...tasks, createdTask]);
+            const { code, message, data } = await createNewTask(newTask);
+            if (code === 200) {
+                setTasks([...tasks, data]);  // 假设创建的任务数据存储在 data 中
+            } else {
+                console.error(message); // 如果没有成功，打印错误消息
+            }
         } catch (error) {
             console.error('任务创建失败:', error.message);
         }
@@ -37,8 +46,12 @@ export default function Task() {
     // 删除任务
     const handleDeleteTask = async (taskId) => {
         try {
-            await deleteTask(taskId);
-            setTasks(tasks.filter(task => task.id !== taskId)); // 更新任务列表
+            const { code, message } = await deleteTask(taskId);
+            if (code === 200) {
+                setTasks(tasks.filter(task => task.id !== taskId)); // 更新任务列表
+            } else {
+                console.error(message); // 如果删除失败，打印错误消息
+            }
         } catch (error) {
             console.error('删除任务失败:', error.message);
         }
@@ -46,7 +59,7 @@ export default function Task() {
 
     const handleUpdateTask = (taskId) => {
         // 这里实现更新任务的逻辑
-        console.log("Updating task:", taskId)
+        console.log("Updating task:", taskId);
     }
 
     return (
