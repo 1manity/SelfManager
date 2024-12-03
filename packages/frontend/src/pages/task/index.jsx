@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose } from "@/components/ui/sheet"
 import { getAllTask, createNewTask, deleteTask } from "@/api/task"
+import { IconPencil,IconTrash,IconCalendar   } from '@tabler/icons-react';
 
 export default function Task() {
     const [tasks, setTasks] = useState([])
@@ -69,22 +70,31 @@ export default function Task() {
                 <Button onClick={() => setIsAddTaskOpen(true)}>添加任务</Button>
             </div>
             <div className="flex-1 bg-[#fafafa] p-6 overflow-auto">
-                <h2 className="text-xl font-semibold mb-4">今日待完成任务</h2>
+                <h2 className="text-2xl font-semibold mb-6">今日待完成任务</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {tasks.map((task) => (
-                <Card key={task.id} className="mb-4">
-                    <CardHeader>
-                    <CardTitle>{task.title}</CardTitle>
+                    <Card key={task.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-lg">{task.title}</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                    <p>{task.description}</p>
-                    <p className="text-sm text-gray-500 mt-2">截止日期: {new Date(task.dueDate).toLocaleString()}</p>
+                    <CardContent className="pb-2">
+                        <p className="text-sm text-gray-600 line-clamp-2">{task.description}</p>
+                        <div className="flex items-center text-xs text-gray-500 mt-2">
+                        <IconCalendar className="w-3 h-3 mr-1" />
+                        {new Date(task.dueDate).toLocaleDateString()}
+                        </div>
                     </CardContent>
-                    <CardFooter className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={() => handleUpdateTask(task.id)}>修改</Button>
-                    <Button variant="destructive" onClick={() => handleDeleteTask(task.id)}>删除</Button>
+                    <CardFooter className="flex justify-end space-x-2 pt-2">
+                        <Button size="sm" variant="ghost" onClick={() => handleUpdateTask(task.id)}>
+                        <IconPencil className="w-4 h-4" />
+                        </Button>
+                        <Button size="sm" variant="ghost" className="text-destructive" onClick={() => handleDeleteTask(task.id)}>
+                        <IconTrash className="w-4 h-4" />
+                        </Button>
                     </CardFooter>
-                </Card>
+                    </Card>
                 ))}
+                </div>
             </div>
 
             <Sheet open={isAddTaskOpen} onOpenChange={setIsAddTaskOpen}>
