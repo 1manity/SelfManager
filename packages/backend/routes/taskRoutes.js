@@ -100,7 +100,8 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 router.patch('/:id/status', authMiddleware, async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
-
+    const userId = req.user.id; // 从 authMiddleware 获取用户 ID
+    
     try {
         // 校验任务是否属于当前用户
         const task = await TaskService.getTaskById(id);
@@ -114,6 +115,7 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
         const patchedTask = await TaskService.updateTaskStatus(id, status);
         res.json(ApiResponse.success('更新任务状态成功', patchedTask));
     } catch (err) {
+        console.log(err);
         res.status(400).json(ApiResponse.error(err.message));
     }
 });

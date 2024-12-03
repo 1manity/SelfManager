@@ -5,13 +5,17 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose } from "@/components/ui/sheet"
-import { getAllTask, createNewTask, deleteTask } from "@/api/task"
-import { IconPencil,IconTrash,IconCalendar   } from '@tabler/icons-react';
+import { getAllTask, createNewTask, deleteTask, updateTask, updateTaskStatus } from "@/api/task"
+import { IconPencil, IconTrash, IconCalendar } from '@tabler/icons-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
 
 export default function Task() {
     const [tasks, setTasks] = useState([])
     const [isAddTaskOpen, setIsAddTaskOpen] = useState(false)
+    const [isEditTaskOpen, setIsEditTaskOpen] = useState(false)
     const [newTask, setNewTask] = useState({ title: "", description: "", dueDate: "" })
+    const [editingTask, setEditingTask] = useState(null)
 
     useEffect(() => {
         fetchTasks();
@@ -19,48 +23,73 @@ export default function Task() {
 
     const fetchTasks = async () => {
         try {
-            const { code, message, data } = await getAllTask();  // 直接获取结构化的 { code, message, data }
+            const { code, message, data } = await getAllTask();
             if (code === 200) {
-                setTasks(data); // 假设任务数据存储在 data 中
+                setTasks(data);
             } else {
-                console.error(message); // 如果没有成功，打印错误消息
+                console.error(message);
             }
         } catch (error) {
             console.error("Error fetching tasks:", error);
         }
     }
 
-    // 创建任务
     const handleCreateTask = async () => {
         try {
             const { code, message, data } = await createNewTask(newTask);
             if (code === 200) {
-                setTasks([...tasks, data]);  // 假设创建的任务数据存储在 data 中
+                setTasks([...tasks, data]);
+                setIsAddTaskOpen(false);
+                setNewTask({ title: "", description: "", dueDate: "" });
             } else {
-                console.error(message); // 如果没有成功，打印错误消息
+                console.error(message);
             }
         } catch (error) {
             console.error('任务创建失败:', error.message);
         }
     };
 
-    // 删除任务
     const handleDeleteTask = async (taskId) => {
         try {
             const { code, message } = await deleteTask(taskId);
             if (code === 200) {
-                setTasks(tasks.filter(task => task.id !== taskId)); // 更新任务列表
+                setTasks(tasks.filter(task => task.id !== taskId));
             } else {
-                console.error(message); // 如果删除失败，打印错误消息
+                console.error(message);
             }
         } catch (error) {
             console.error('删除任务失败:', error.message);
         }
     };
 
-    const handleUpdateTask = (taskId) => {
-        // 这里实现更新任务的逻辑
-        console.log("Updating task:", taskId);
+    const handleUpdateTask = async () => {
+        try {
+            const { code, message, data } = await updateTask(editingTask.id, editingTask);
+            if (code === 200) {
+                setTasks(tasks.map(task => task.id === editingTask.id ? data : task));
+                setIsEditTaskOpen(false);
+                setEditingTask(null);
+            } else {
+                console.error(message);
+            }
+        } catch (error) {
+            console.error('更新任务失败:', error.message);
+        }
+    }
+
+    const handleStatusChange = (taskId, newStatus) => {
+        // This function will be implemented by you
+        console.log(`Changing status of task ${taskId} to ${newStatus}`);
+        try {
+            updateTaskStatus(taskId, newStatus);
+        } catch (error) {
+            console.error('更新任务状态失败:', error.message);
+        }
+    };
+
+    const openEditTask = (task) => {
+        setEditingTask(task);
+        setIsEditTaskOpen(true);
     }
 
     return (
@@ -75,17 +104,36 @@ export default function Task() {
                 {tasks.map((task) => (
                     <Card key={task.id} className="hover:shadow-md transition-shadow">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-lg">{task.title}</CardTitle>
+                        <div className="flex justify-between">
+                            <CardTitle className="text-lg">{task.title}</CardTitle>
+                            <div className="flex items-center text-xs text-gray-500 mt-2">
+                                <IconCalendar className="w-3 h-3 mr-1" />
+                                {new Date(task.dueDate).toLocaleDateString()}
+                                {' '}截止
+                            </div>
+                        </div>
+
                     </CardHeader>
                     <CardContent className="pb-2">
                         <p className="text-sm text-gray-600 line-clamp-2">{task.description}</p>
-                        <div className="flex items-center text-xs text-gray-500 mt-2">
-                        <IconCalendar className="w-3 h-3 mr-1" />
-                        {new Date(task.dueDate).toLocaleDateString()}
-                        </div>
+                        
+                        
                     </CardContent>
                     <CardFooter className="flex justify-end space-x-2 pt-2">
-                        <Button size="sm" variant="ghost" onClick={() => handleUpdateTask(task.id)}>
+                        <Select
+                            defaultValue={task.status}
+                            onValueChange={(value) => handleStatusChange(task.id, value)}
+                        >
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="pending">待完成</SelectItem>
+                                <SelectItem value="in-progress">进行中</SelectItem>
+                                <SelectItem value="completed">已完成</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Button size="sm" variant="ghost" onClick={() => openEditTask(task)}>
                         <IconPencil className="w-4 h-4" />
                         </Button>
                         <Button size="sm" variant="ghost" className="text-destructive" onClick={() => handleDeleteTask(task.id)}>
@@ -145,6 +193,58 @@ export default function Task() {
                 </SheetFooter>
                 </SheetContent>
             </Sheet>
+
+            <Sheet open={isEditTaskOpen} onOpenChange={setIsEditTaskOpen}>
+                <SheetContent>
+                <SheetHeader>
+                    <SheetTitle>编辑任务</SheetTitle>
+                </SheetHeader>
+                {editingTask && (
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-title" className="text-right">
+                            标题
+                        </Label>
+                        <Input
+                            id="edit-title"
+                            value={editingTask.title}
+                            onChange={(e) => setEditingTask({ ...editingTask, title: e.target.value })}
+                            className="col-span-3"
+                        />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-description" className="text-right">
+                            内容
+                        </Label>
+                        <Textarea
+                            id="edit-description"
+                            value={editingTask.description}
+                            onChange={(e) => setEditingTask({ ...editingTask, description: e.target.value })}
+                            className="col-span-3"
+                        />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-dueDate" className="text-right">
+                            截止日期
+                        </Label>
+                        <Input
+                            id="edit-dueDate"
+                            type="datetime-local"
+                            value={editingTask.dueDate}
+                            onChange={(e) => setEditingTask({ ...editingTask, dueDate: e.target.value })}
+                            className="col-span-3"
+                        />
+                        </div>
+                    </div>
+                )}
+                <SheetFooter>
+                    <SheetClose asChild>
+                    <Button type="submit" onClick={handleUpdateTask}>更新任务</Button>
+                    </SheetClose>
+                </SheetFooter>
+                </SheetContent>
+            </Sheet>
         </div>
     )
 }
+
