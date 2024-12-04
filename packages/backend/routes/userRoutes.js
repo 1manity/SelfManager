@@ -29,7 +29,11 @@ router.post('/login', async (req, res) => {
 
         // 使用环境变量来管理 JWT 的 secret key
         const secretKey = process.env.JWT_SECRET_KEY;
-        const token = jwt.sign({ id: user.id, username: user.username }, secretKey, { expiresIn: '1h' });
+        const token = jwt.sign(
+            { id: user.id, username: user.username },
+            secretKey,
+            { expiresIn: '1h' }
+        );
 
         res.json(ApiResponse.success('登录成功', { token }));
     } catch (error) {

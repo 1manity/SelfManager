@@ -1,5 +1,4 @@
-const {User}  = require('../database/models');
-
+const { User } = require('../database/models');
 
 const UserService = {
     // 创建用户
@@ -7,7 +6,6 @@ const UserService = {
         const user = await User.create({ username, password });
         return user;
     },
-
     // 获取用户
     async getUserById(userId) {
         return await User.findByPk(userId);

@@ -20,5 +20,5 @@ const HomeButton = ({ children, onClick, className = '' }) => {
             {children}
         </button>
     );
-}
-export default HomeButton
+};
+export default HomeButton;

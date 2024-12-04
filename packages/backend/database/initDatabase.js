@@ -1,10 +1,8 @@
 'use strict';
 
 const { Sequelize } = require('sequelize');
-const { sequelize } = require('./models')
+const { sequelize } = require('./models');
 const initDatabase = async () => {
-
-
     try {
         // 测试数据库连接
         await sequelize.authenticate();

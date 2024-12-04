@@ -1,42 +1,42 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import {Sidebar, SidebarBody, SidebarLink} from "@/components/ui/sidebar.jsx";
-import {cn} from "@/lib/utils.js";
+import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar.jsx';
+import { cn } from '@/lib/utils.js';
 import {
     IconArrowLeft,
     IconBrandTabler,
     IconSettings,
     IconUserBolt,
-    IconChecklist
-} from "@tabler/icons-react";
-import { useState } from'react';
+    IconChecklist,
+} from '@tabler/icons-react';
+import { useState } from 'react';
 
 const Layout = () => {
     const links = [
         {
-            label: "Dashboard",
-            href: "/dashboard",
+            label: 'Dashboard',
+            href: '/dashboard',
             icon: (
                 <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
             ),
         },
         {
-            label: "Tasks",
-            href: "tasks",
+            label: 'Tasks',
+            href: 'tasks',
             icon: (
                 <IconChecklist className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
             ),
         },
         {
-            label: "Settings",
-            href: "#",
+            label: 'Settings',
+            href: '#',
             icon: (
                 <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
             ),
         },
         {
-            label: "Logout",
-            href: "#",
+            label: 'Logout',
+            href: '#',
             icon: (
                 <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
             ),
@@ -46,8 +46,8 @@ const Layout = () => {
     return (
         <div
             className={cn(
-                "rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full flex-1 border border-neutral-200 dark:border-neutral-700 overflow-hidden",
-                "h-screen" // for your use case, use `h-screen` instead of `h-[60vh]` max-w-7xl mx-auto
+                'rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full flex-1 border border-neutral-200 dark:border-neutral-700 overflow-hidden',
+                'h-screen' // for your use case, use `h-screen` instead of `h-[60vh]` max-w-7xl mx-auto
             )}
         >
             <Sidebar open={open} setOpen={setOpen}>
@@ -63,8 +63,8 @@ const Layout = () => {
                     <div>
                         <SidebarLink
                             link={{
-                                label: "1manity",
-                                href: "#",
+                                label: '1manity',
+                                href: '#',
                                 icon: (
                                     <img
                                         src="https://1manity.top/10.jpg"
@@ -84,7 +84,6 @@ const Layout = () => {
                     <Outlet></Outlet>
                 </div>
             </div>
-            
         </div>
     );
 };

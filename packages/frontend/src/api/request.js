@@ -27,10 +27,10 @@ request.interceptors.request.use(
 request.interceptors.response.use(
     (response) => {
         const { code, message, data } = response.data;
-        
+
         // 统一处理成功响应
         if (code === 200) {
-            return { code, message, data };  // 只返回必要的数据
+            return { code, message, data }; // 只返回必要的数据
         } else {
             return Promise.reject(new Error(message || 'Unknown error'));
         }
@@ -43,6 +43,5 @@ request.interceptors.response.use(
         return Promise.reject(error); // 返回 Promise.reject 保证错误被抛出
     }
 );
-
 
 export default request;

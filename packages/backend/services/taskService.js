@@ -25,7 +25,12 @@ const TaskService = {
     // 获取指定用户的所有任务
     async getUserTasks(userId) {
         const user = await User.findByPk(userId, {
-            include: Task, // 关联查询任务
+            include: [
+                {
+                    model: Task,
+                    as: 'tasks',
+                },
+            ], // 关联查询任务
         });
         if (!user) throw new Error('User not found');
         return user.Tasks; // 返回该用户的任务列表

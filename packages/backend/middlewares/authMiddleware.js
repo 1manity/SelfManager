@@ -2,13 +2,14 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 dotenv.config(); // 加载.env文件中的环境变量
 
-
 const authMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;
     // console.log("DEBUG :: authMiddleware" + authHeader)
     // 检查是否有 Authorization 头
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Unauthorized: No token provided' });
+        return res
+            .status(401)
+            .json({ message: 'Unauthorized: No token provided' });
     }
 
     // 提取令牌

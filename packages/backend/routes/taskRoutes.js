@@ -10,7 +10,12 @@ router.post('/', authMiddleware, async (req, res) => {
     const userId = req.user.id; // 从 authMiddleware 获取用户 ID
 
     try {
-        const task = await TaskService.createTask(userId, title, description, dueDate);
+        const task = await TaskService.createTask(
+            userId,
+            title,
+            description,
+            dueDate
+        );
         res.status(201).json(ApiResponse.success('任务创建成功', task));
     } catch (err) {
         res.status(400).json(ApiResponse.error(err.message));
@@ -36,11 +41,14 @@ router.get('/:id', authMiddleware, async (req, res) => {
 
     try {
         const task = await TaskService.getTaskById(id);
-        if (!task) return res.status(404).json(ApiResponse.notFound('未找到任务'));
+        if (!task)
+            return res.status(404).json(ApiResponse.notFound('未找到任务'));
 
         // 校验任务是否属于当前用户
         if (task.userId !== userId) {
-            return res.status(403).json(ApiResponse.forbidden('你只能浏览你自己的任务'));
+            return res
+                .status(403)
+                .json(ApiResponse.forbidden('你只能浏览你自己的任务'));
         }
 
         res.json(ApiResponse.success('任务获取成功', task));
@@ -58,11 +66,14 @@ router.put('/:id', authMiddleware, async (req, res) => {
     try {
         // 校验任务是否属于当前用户
         const task = await TaskService.getTaskById(id);
-        if (!task) return res.status(404).json(ApiResponse.notFound('未找到任务'));
+        if (!task)
+            return res.status(404).json(ApiResponse.notFound('未找到任务'));
 
         // 如果任务不属于当前用户，返回 403 错误
         if (task.userId !== userId) {
-            return res.status(403).json(ApiResponse.forbidden('你只能浏览你自己的任务'));
+            return res
+                .status(403)
+                .json(ApiResponse.forbidden('你只能浏览你自己的任务'));
         }
 
         // 执行更新
@@ -81,11 +92,14 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         // 校验任务是否属于当前用户
         const task = await TaskService.getTaskById(id);
-        if (!task) return res.status(404).json(ApiResponse.notFound('未找到任务'));
+        if (!task)
+            return res.status(404).json(ApiResponse.notFound('未找到任务'));
 
         // 如果任务不属于当前用户，返回 403 错误
         if (task.userId !== userId) {
-            return res.status(403).json(ApiResponse.forbidden('你只能操作你自己的任务'));
+            return res
+                .status(403)
+                .json(ApiResponse.forbidden('你只能操作你自己的任务'));
         }
 
         // 执行删除
@@ -101,15 +115,18 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     const userId = req.user.id; // 从 authMiddleware 获取用户 ID
-    
+
     try {
         // 校验任务是否属于当前用户
         const task = await TaskService.getTaskById(id);
-        if (!task) return res.status(404).json(ApiResponse.notFound('未找到任务'));
+        if (!task)
+            return res.status(404).json(ApiResponse.notFound('未找到任务'));
 
         // 如果任务不属于当前用户，返回 403 错误
         if (task.userId !== userId) {
-            return res.status(403).json(ApiResponse.forbidden('你只能操作你自己的任务'));
+            return res
+                .status(403)
+                .json(ApiResponse.forbidden('你只能操作你自己的任务'));
         }
 
         const patchedTask = await TaskService.updateTaskStatus(id, status);

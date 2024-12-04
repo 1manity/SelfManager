@@ -44,6 +44,7 @@ module.exports = (sequelize, DataTypes) => {
     Task.associate = (models) => {
         Task.belongsTo(models.User, {
             foreignKey: 'userId', // 明确指定外键名称
+            as: 'user',
             allowNull: false,
             onDelete: 'CASCADE',
         });

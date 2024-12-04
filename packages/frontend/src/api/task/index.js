@@ -8,14 +8,14 @@ export const getAllTask = async () => {
         console.error('获取任务失败:', error.message);
         throw error;
     }
-}
+};
 export const createNewTask = async (taskData) => {
     // {
     //     "title": "Task Title",
     //     "description": "Task Description",
     //     "dueDate": "2024-12-01T12:00:00Z"
     // }
-      
+
     try {
         const response = await request.post('/tasks', taskData);
         return response;
@@ -23,7 +23,7 @@ export const createNewTask = async (taskData) => {
         console.error('创建任务失败:', error.message);
         throw error;
     }
-}
+};
 
 // 获取单个任务
 export const getTaskById = async (taskId) => {
@@ -34,7 +34,7 @@ export const getTaskById = async (taskId) => {
         console.error('获取任务失败:', error.message);
         throw error;
     }
-}
+};
 
 // 更新任务
 export const updateTask = async (taskId, taskData) => {
@@ -45,7 +45,7 @@ export const updateTask = async (taskId, taskData) => {
         console.error('更新任务失败:', error.message);
         throw error;
     }
-}
+};
 
 // 删除任务
 export const deleteTask = async (taskId) => {
@@ -56,15 +56,17 @@ export const deleteTask = async (taskId) => {
         console.error('删除任务失败:', error.message);
         throw error;
     }
-}
+};
 
 // 更新任务状态
 export const updateTaskStatus = async (taskId, status) => {
     try {
-        const response = await request.patch(`/tasks/${taskId}/status`, { status });
+        const response = await request.patch(`/tasks/${taskId}/status`, {
+            status,
+        });
         return response;
     } catch (error) {
         console.error('更新任务状态失败:', error.message);
         throw error;
     }
-}
+};
