@@ -33,7 +33,7 @@ const TaskService = {
             ], // 关联查询任务
         });
         if (!user) throw new Error('User not found');
-        return user.Tasks; // 返回该用户的任务列表
+        return user.tasks; // 返回该用户的任务列表
     },
 
     // 更新任务
