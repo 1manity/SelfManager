@@ -53,6 +53,7 @@ export default [
                     tabWidth: 4, // 每个缩进为 2 个空格
                     printWidth: 80, // 每行最大字符数
                     arrowParens: 'always', // 总是使用箭头函数括号
+                    "endOfLine": "auto",
                 },
             ],
             // 如果希望 React Hooks 更宽松，可以禁用这两个规则

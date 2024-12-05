@@ -24,7 +24,7 @@ class ApiResponse {
     }
 
     static noContent(message = 'No content', data = {}) {
-        return new ApiResponse(204, message, data);
+        return new ApiResponse(200, message, data);
     }
 }
 

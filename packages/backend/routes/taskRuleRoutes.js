@@ -18,7 +18,7 @@ router.post('/', authMiddleware, async (req, res) => {
             daysOfWeek,
             timeOfDay,
         });
-        res.status(201).json(ApiResponse.success('规则任务创建成功', rule));
+        res.status(200).json(ApiResponse.success('规则任务创建成功', rule));
     } catch (error) {
         res.status(400).json(ApiResponse.error(error.message));
     }
@@ -84,7 +84,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 
     try {
         await TaskRuleService.deleteTaskRule(id, userId);
-        res.status(204).json(ApiResponse.noContent('规则任务删除成功'));
+        res.status(200).json(ApiResponse.noContent('规则任务删除成功'));
     } catch (error) {
         if (error.message === '规则任务未找到') {
             return res.status(404).json(ApiResponse.notFound('规则任务未找到'));

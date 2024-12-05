@@ -1,6 +1,5 @@
 // src/api/axiosInstance.js
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 // 创建 Axios 实例
 const request = axios.create({

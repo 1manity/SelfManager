@@ -5,6 +5,8 @@ import { Route, Routes } from 'react-router-dom';
 import Dashboard from './pages/dashboard/index.jsx';
 import Task from './pages/task/index.jsx';
 import Layout from './components/layout/index.jsx';
+import { Navigate } from 'react-router-dom';
+
 function App() {
     return (
         <div className={'min-h-screen'}>
