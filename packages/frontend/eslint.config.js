@@ -50,8 +50,8 @@ export default [
                     singleQuote: true, // 使用单引号
                     trailingComma: 'es5', // 对象和数组元素后添加逗号
                     semi: true, // 强制分号
-                    tabWidth: 4, // 每个缩进为 2 个空格
-                    printWidth: 80, // 每行最大字符数
+                    tabWidth: 4, // 每个缩进为 4 个空格
+                    printWidth: 120, // 每行最大字符数
                     arrowParens: 'always', // 总是使用箭头函数括号
                     "endOfLine": "auto",
                 },

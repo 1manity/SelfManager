@@ -3,14 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-    CardContent,
-    CardFooter,
-} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { login } from '@/api/user/auth.js';
 import { useToast } from '@/hooks/use-toast.js';
 import { ToastAction } from '@/components/ui/toast.jsx';
@@ -55,12 +48,8 @@ export default function Login() {
         <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
             <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1">
-                    <CardTitle className="text-2xl font-bold text-center">
-                        登录
-                    </CardTitle>
-                    <CardDescription className="text-center">
-                        输入您的账号和密码登录
-                    </CardDescription>
+                    <CardTitle className="text-2xl font-bold text-center">登录</CardTitle>
+                    <CardDescription className="text-center">输入您的账号和密码登录</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -98,10 +87,7 @@ export default function Login() {
                     </form>
                 </CardContent>
                 <CardFooter className="flex justify-center">
-                    <Button
-                        variant="link"
-                        onClick={() => navigate('/forgot-password')}
-                    >
+                    <Button variant="link" onClick={() => navigate('/forgot-password')}>
                         忘记密码？
                     </Button>
                 </CardFooter>

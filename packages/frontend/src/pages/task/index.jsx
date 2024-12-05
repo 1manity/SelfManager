@@ -3,33 +3,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetFooter,
-    SheetClose,
-} from '@/components/ui/sheet';
-import {
-    getAllTask,
-    createNewTask,
-    deleteTask,
-    updateTask,
-    updateTaskStatus,
-} from '@/api/task';
-import {
-    getAllTaskRules,
-    createNewTaskRule,
-    deleteTaskRule,
-    updateTaskRule,
-} from '@/api/taskRule';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetClose } from '@/components/ui/sheet';
+import { getAllTask, createNewTask, deleteTask, updateTask, updateTaskStatus } from '@/api/task';
+import { getAllTaskRules, createNewTaskRule, deleteTaskRule, updateTaskRule } from '@/api/taskRule';
 
 import TaskCard from './components/TaskCard';
 import TaskRuleCard from './components/TaskRuleCard';
 
 export default function Task() {
+    const { toast } = useToast();
+
     const [tasks, setTasks] = useState([]);
     const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
     const [isEditTaskOpen, setIsEditTaskOpen] = useState(false);
@@ -89,13 +74,15 @@ export default function Task() {
         try {
             const { code, message, data } = await createNewTask(newTask);
             if (code === 200) {
+                toast({ title: '任务创建成功😃' });
                 setTasks([...tasks, data]);
                 setIsAddTaskOpen(false);
                 setNewTask({ title: '', description: '', dueDate: '' });
             } else {
-                console.error(message);
+                throw new Error(message);
             }
         } catch (error) {
+            toast({ title: '任务创建失败😢', description: error });
             console.error('任务创建失败:', error.message);
         }
     };
@@ -104,33 +91,30 @@ export default function Task() {
         try {
             const { code, message } = await deleteTask(taskId);
             if (code === 200) {
+                toast({ title: '任务删除成功😃' });
                 setTasks(tasks.filter((task) => task.id !== taskId));
             } else {
-                console.error(message);
+                throw new Error(message);
             }
         } catch (error) {
+            toast({ title: '任务删除失败😢', description: error });
             console.error('删除任务失败:', error.message);
         }
     };
 
     const handleUpdateTask = async () => {
         try {
-            const { code, message, data } = await updateTask(
-                editingTask.id,
-                editingTask
-            );
+            const { code, message, data } = await updateTask(editingTask.id, editingTask);
             if (code === 200) {
-                setTasks(
-                    tasks.map((task) =>
-                        task.id === editingTask.id ? data : task
-                    )
-                );
+                toast({ title: '任务更新成功😃' });
+                setTasks(tasks.map((task) => (task.id === editingTask.id ? data : task)));
                 setIsEditTaskOpen(false);
                 setEditingTask(null);
             } else {
-                console.error(message);
+                throw new Error(message);
             }
         } catch (error) {
+            toast({ title: '任务更新失败😢', description: error });
             console.error('更新任务失败:', error.message);
         }
     };
@@ -139,8 +123,14 @@ export default function Task() {
         // This function will be implemented by you
         console.log(`Changing status of task ${taskId} to ${newStatus}`);
         try {
-            updateTaskStatus(taskId, newStatus);
+            updateTaskStatus(taskId, newStatus).then((res) => {
+                if (res.code === 200) {
+                    toast({ title: '任务状态更新成功😃' });
+                    setTasks(tasks.map((task) => (task.id === editingTask.id ? res.data : task)));
+                }
+            });
         } catch (error) {
+            toast({ title: '任务状态更新失败😢', description: error });
             console.error('更新任务状态失败:', error.message);
         }
     };
@@ -153,9 +143,9 @@ export default function Task() {
     // 任务规则相关处理函数
     const handleCreateTaskRule = async () => {
         try {
-            const { code, message, data } =
-                await createNewTaskRule(newTaskRule);
-            if (code === 201) {
+            const { code, message, data } = await createNewTaskRule(newTaskRule);
+            if (code === 200) {
+                toast({ title: '规则任务创建成功😃' });
                 setTaskRules([...taskRules, data]);
                 setIsAddTaskRuleOpen(false);
                 setNewTaskRule({
@@ -166,9 +156,10 @@ export default function Task() {
                     timeOfDay: '09:00:00',
                 });
             } else {
-                console.error(message);
+                throw new Error(message);
             }
         } catch (error) {
+            toast({ title: '规则任务创建失败😢', description: error });
             console.error('规则任务创建失败:', error.message);
         }
     };
@@ -176,34 +167,31 @@ export default function Task() {
     const handleDeleteTaskRule = async (taskRuleId) => {
         try {
             const { code, message } = await deleteTaskRule(taskRuleId);
-            if (code === 204) {
-                setTaskRules(
-                    taskRules.filter((rule) => rule.id !== taskRuleId)
-                );
+            if (code === 200) {
+                toast({ title: '规则任务删除成功😃' });
+                setTaskRules(taskRules.filter((rule) => rule.id !== taskRuleId));
             } else {
-                console.error(message);
+                throw new Error(message);
             }
         } catch (error) {
+            toast({ title: '规则任务删除失败😢', description: error });
             console.error('删除规则任务失败:', error.message);
         }
     };
 
     const handleUpdateTaskRule = async () => {
         try {
-            const { code, message, data } = await updateTaskRule(
-                editingTaskRule.id,
-                newTaskRule
-            );
+            const { code, message, data } = await updateTaskRule(editingTaskRule.id, newTaskRule);
             if (code === 200) {
-                setTaskRules(
-                    taskRules.map((rule) => (rule.id === data.id ? data : rule))
-                );
+                toast({ title: '规则任务更新成功😃' });
+                setTaskRules(taskRules.map((rule) => (rule.id === data.id ? data : rule)));
                 setIsEditTaskRuleOpen(false);
                 setEditingTaskRule(null);
             } else {
-                console.error(message);
+                throw new Error(message);
             }
         } catch (error) {
+            toast({ title: '规则任务更新失败😢', description: error });
             console.error('规则任务更新失败:', error.message);
         }
     };
@@ -222,17 +210,10 @@ export default function Task() {
     return (
         <div className="flex h-screen">
             <div className="w-64 p-6 border-r">
-                <h1 className="scroll-m-20 text-2xl font-thin tracking-tight mb-4">
-                    任务
-                </h1>
+                <h1 className="scroll-m-20 text-2xl font-thin tracking-tight mb-4">任务</h1>
                 <Button onClick={() => setIsAddTaskOpen(true)}>添加任务</Button>
-                <h1 className="scroll-m-20 text-2xl font-thin tracking-tight mb-4 mt-4">
-                    任务规则
-                </h1>
-                <Button
-                    onClick={() => setIsAddTaskRuleOpen(true)}
-                    className="mb-2"
-                >
+                <h1 className="scroll-m-20 text-2xl font-thin tracking-tight mb-4 mt-4">任务规则</h1>
+                <Button onClick={() => setIsAddTaskRuleOpen(true)} className="mb-2">
                     添加任务规则
                 </Button>
             </div>
@@ -336,10 +317,7 @@ export default function Task() {
                     {editingTask && (
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label
-                                    htmlFor="edit-title"
-                                    className="text-right"
-                                >
+                                <Label htmlFor="edit-title" className="text-right">
                                     标题
                                 </Label>
                                 <Input
@@ -355,10 +333,7 @@ export default function Task() {
                                 />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label
-                                    htmlFor="edit-description"
-                                    className="text-right"
-                                >
+                                <Label htmlFor="edit-description" className="text-right">
                                     内容
                                 </Label>
                                 <Textarea
@@ -374,10 +349,7 @@ export default function Task() {
                                 />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label
-                                    htmlFor="edit-dueDate"
-                                    className="text-right"
-                                >
+                                <Label htmlFor="edit-dueDate" className="text-right">
                                     截止日期
                                 </Label>
                                 <Input
@@ -432,10 +404,7 @@ export default function Task() {
 
                         {/* 规则描述 */}
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label
-                                htmlFor="rule-description"
-                                className="text-right"
-                            >
+                            <Label htmlFor="rule-description" className="text-right">
                                 描述
                             </Label>
                             <Textarea
@@ -453,10 +422,7 @@ export default function Task() {
 
                         {/* 频率选择 */}
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label
-                                htmlFor="rule-frequency"
-                                className="text-right"
-                            >
+                            <Label htmlFor="rule-frequency" className="text-right">
                                 频率
                             </Label>
                             <select
@@ -482,50 +448,23 @@ export default function Task() {
                                 <Label className="text-right">星期几</Label>
                                 <div className="col-span-3 flex flex-wrap">
                                     {[0, 1, 2, 3, 4, 5, 6].map((day) => (
-                                        <label
-                                            key={day}
-                                            className="mr-4 flex items-center"
-                                        >
+                                        <label key={day} className="mr-4 flex items-center">
                                             <input
                                                 type="checkbox"
                                                 value={day}
-                                                checked={newTaskRule.daysOfWeek.includes(
-                                                    day
-                                                )}
+                                                checked={newTaskRule.daysOfWeek.includes(day)}
                                                 onChange={(e) => {
-                                                    const dayValue = parseInt(
-                                                        e.target.value
-                                                    );
+                                                    const dayValue = parseInt(e.target.value);
                                                     setNewTaskRule((prev) => ({
                                                         ...prev,
-                                                        daysOfWeek:
-                                                            prev.daysOfWeek.includes(
-                                                                dayValue
-                                                            )
-                                                                ? prev.daysOfWeek.filter(
-                                                                      (d) =>
-                                                                          d !==
-                                                                          dayValue
-                                                                  )
-                                                                : [
-                                                                      ...prev.daysOfWeek,
-                                                                      dayValue,
-                                                                  ],
+                                                        daysOfWeek: prev.daysOfWeek.includes(dayValue)
+                                                            ? prev.daysOfWeek.filter((d) => d !== dayValue)
+                                                            : [...prev.daysOfWeek, dayValue],
                                                     }));
                                                 }}
                                                 className="mr-1"
                                             />
-                                            {
-                                                [
-                                                    '周日',
-                                                    '周一',
-                                                    '周二',
-                                                    '周三',
-                                                    '周四',
-                                                    '周五',
-                                                    '周六',
-                                                ][day]
-                                            }
+                                            {['周日', '周一', '周二', '周三', '周四', '周五', '周六'][day]}
                                         </label>
                                     ))}
                                 </div>
@@ -534,10 +473,7 @@ export default function Task() {
 
                         {/* 执行时间 */}
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label
-                                htmlFor="rule-timeOfDay"
-                                className="text-right"
-                            >
+                            <Label htmlFor="rule-timeOfDay" className="text-right">
                                 执行时间
                             </Label>
                             <Input
@@ -556,10 +492,7 @@ export default function Task() {
                     </div>
                     <SheetFooter>
                         <SheetClose asChild>
-                            <Button
-                                type="submit"
-                                onClick={handleCreateTaskRule}
-                            >
+                            <Button type="submit" onClick={handleCreateTaskRule}>
                                 创建规则任务
                             </Button>
                         </SheetClose>
@@ -568,10 +501,7 @@ export default function Task() {
             </Sheet>
 
             {/* 编辑任务规则弹窗 */}
-            <Sheet
-                open={isEditTaskRuleOpen}
-                onOpenChange={setIsEditTaskRuleOpen}
-            >
+            <Sheet open={isEditTaskRuleOpen} onOpenChange={setIsEditTaskRuleOpen}>
                 <SheetContent>
                     <SheetHeader>
                         <SheetTitle>编辑任务规则</SheetTitle>
@@ -580,10 +510,7 @@ export default function Task() {
                         <div className="grid gap-4 py-4">
                             {/* 规则标题 */}
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label
-                                    htmlFor="edit-rule-title"
-                                    className="text-right"
-                                >
+                                <Label htmlFor="edit-rule-title" className="text-right">
                                     标题
                                 </Label>
                                 <Input
@@ -601,10 +528,7 @@ export default function Task() {
 
                             {/* 规则描述 */}
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label
-                                    htmlFor="edit-rule-description"
-                                    className="text-right"
-                                >
+                                <Label htmlFor="edit-rule-description" className="text-right">
                                     描述
                                 </Label>
                                 <Textarea
@@ -622,10 +546,7 @@ export default function Task() {
 
                             {/* 频率选择 */}
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label
-                                    htmlFor="edit-rule-frequency"
-                                    className="text-right"
-                                >
+                                <Label htmlFor="edit-rule-frequency" className="text-right">
                                     频率
                                 </Label>
                                 <select
@@ -651,55 +572,23 @@ export default function Task() {
                                     <Label className="text-right">星期几</Label>
                                     <div className="col-span-3 flex flex-wrap">
                                         {[0, 1, 2, 3, 4, 5, 6].map((day) => (
-                                            <label
-                                                key={day}
-                                                className="mr-4 flex items-center"
-                                            >
+                                            <label key={day} className="mr-4 flex items-center">
                                                 <input
                                                     type="checkbox"
                                                     value={day}
-                                                    checked={newTaskRule.daysOfWeek.includes(
-                                                        day
-                                                    )}
+                                                    checked={newTaskRule.daysOfWeek.includes(day)}
                                                     onChange={(e) => {
-                                                        const dayValue =
-                                                            parseInt(
-                                                                e.target.value
-                                                            );
-                                                        setNewTaskRule(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                daysOfWeek:
-                                                                    prev.daysOfWeek.includes(
-                                                                        dayValue
-                                                                    )
-                                                                        ? prev.daysOfWeek.filter(
-                                                                              (
-                                                                                  d
-                                                                              ) =>
-                                                                                  d !==
-                                                                                  dayValue
-                                                                          )
-                                                                        : [
-                                                                              ...prev.daysOfWeek,
-                                                                              dayValue,
-                                                                          ],
-                                                            })
-                                                        );
+                                                        const dayValue = parseInt(e.target.value);
+                                                        setNewTaskRule((prev) => ({
+                                                            ...prev,
+                                                            daysOfWeek: prev.daysOfWeek.includes(dayValue)
+                                                                ? prev.daysOfWeek.filter((d) => d !== dayValue)
+                                                                : [...prev.daysOfWeek, dayValue],
+                                                        }));
                                                     }}
                                                     className="mr-1"
                                                 />
-                                                {
-                                                    [
-                                                        '周日',
-                                                        '周一',
-                                                        '周二',
-                                                        '周三',
-                                                        '周四',
-                                                        '周五',
-                                                        '周六',
-                                                    ][day]
-                                                }
+                                                {['周日', '周一', '周二', '周三', '周四', '周五', '周六'][day]}
                                             </label>
                                         ))}
                                     </div>
@@ -708,10 +597,7 @@ export default function Task() {
 
                             {/* 执行时间 */}
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label
-                                    htmlFor="edit-rule-timeOfDay"
-                                    className="text-right"
-                                >
+                                <Label htmlFor="edit-rule-timeOfDay" className="text-right">
                                     执行时间
                                 </Label>
                                 <Input
@@ -731,10 +617,7 @@ export default function Task() {
                     )}
                     <SheetFooter>
                         <SheetClose asChild>
-                            <Button
-                                type="submit"
-                                onClick={handleUpdateTaskRule}
-                            >
+                            <Button type="submit" onClick={handleUpdateTaskRule}>
                                 更新规则任务
                             </Button>
                         </SheetClose>

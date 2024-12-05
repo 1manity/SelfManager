@@ -2,13 +2,7 @@ import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar.jsx';
 import { cn } from '@/lib/utils.js';
-import {
-    IconArrowLeft,
-    IconBrandTabler,
-    IconSettings,
-    IconUserBolt,
-    IconChecklist,
-} from '@tabler/icons-react';
+import { IconArrowLeft, IconBrandTabler, IconSettings, IconUserBolt, IconChecklist } from '@tabler/icons-react';
 import { useState } from 'react';
 
 const Layout = () => {
@@ -16,30 +10,22 @@ const Layout = () => {
         {
             label: 'Dashboard',
             href: '/dashboard',
-            icon: (
-                <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-            ),
+            icon: <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
         },
         {
             label: 'Tasks',
             href: 'tasks',
-            icon: (
-                <IconChecklist className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-            ),
+            icon: <IconChecklist className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
         },
         {
             label: 'Settings',
             href: '#',
-            icon: (
-                <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-            ),
+            icon: <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
         },
         {
             label: 'Logout',
             href: '#',
-            icon: (
-                <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-            ),
+            icon: <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
         },
     ];
     const [open, setOpen] = useState(false);

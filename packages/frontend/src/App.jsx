@@ -16,14 +16,8 @@ function App() {
 
                 {/* 使用 Layout 作为父路由，嵌套其他路由 */}
                 <Route path="/" element={<Layout />}>
-                    <Route
-                        path="dashboard"
-                        element={<PrivateRoute element={<Dashboard />} />}
-                    />
-                    <Route
-                        path="tasks"
-                        element={<PrivateRoute element={<Task />} />}
-                    />
+                    <Route path="dashboard" element={<PrivateRoute element={<Dashboard />} />} />
+                    <Route path="tasks" element={<PrivateRoute element={<Task />} />} />
                 </Route>
             </Routes>
         </div>

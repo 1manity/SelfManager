@@ -15,22 +15,13 @@ export const useSidebar = () => {
     return context;
 };
 
-export const SidebarProvider = ({
-    children,
-    open: openProp,
-    setOpen: setOpenProp,
-    animate = true,
-}) => {
+export const SidebarProvider = ({ children, open: openProp, setOpen: setOpenProp, animate = true }) => {
     const [openState, setOpenState] = useState(false);
 
     const open = openProp !== undefined ? openProp : openState;
     const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
 
-    return (
-        <SidebarContext.Provider value={{ open, setOpen, animate: animate }}>
-            {children}
-        </SidebarContext.Provider>
-    );
+    return <SidebarContext.Provider value={{ open, setOpen, animate: animate }}>{children}</SidebarContext.Provider>;
 };
 
 export const Sidebar = ({ children, open, setOpen, animate }) => {
@@ -83,10 +74,7 @@ export const MobileSidebar = ({ className, children, ...props }) => {
                 {...props}
             >
                 <div className="flex justify-end z-20 w-full">
-                    <IconMenu2
-                        className="text-neutral-800 dark:text-neutral-200"
-                        onClick={() => setOpen(!open)}
-                    />
+                    <IconMenu2 className="text-neutral-800 dark:text-neutral-200" onClick={() => setOpen(!open)} />
                 </div>
                 <AnimatePresence>
                     {open && (
@@ -124,20 +112,13 @@ export const SidebarLink = ({ link, className, ...props }) => {
         <Link
             href={link.href}
             to={link.href}
-            className={cn(
-                'flex items-center justify-start gap-2  group/sidebar py-2',
-                className
-            )}
+            className={cn('flex items-center justify-start gap-2  group/sidebar py-2', className)}
             {...props}
         >
             {link.icon}
             <motion.span
                 animate={{
-                    display: animate
-                        ? open
-                            ? 'inline-block'
-                            : 'none'
-                        : 'inline-block',
+                    display: animate ? (open ? 'inline-block' : 'none') : 'inline-block',
                     opacity: animate ? (open ? 1 : 0) : 1,
                 }}
                 className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"

@@ -1,11 +1,5 @@
 // src/components/TaskRuleCard.js
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-    CardFooter,
-} from '@/components/ui/card'; // 根据你的项目结构调整路径
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'; // 根据你的项目结构调整路径
 import { Button } from '@/components/ui/button';
 import { IconPencil, IconTrash } from '@tabler/icons-react'; // 根据你的图标组件路径调整
 
@@ -29,9 +23,7 @@ const TaskRuleCard = ({ taskRule, onEdit, onDelete }) => {
                 </div>
             </CardHeader>
             <CardContent className="pb-2">
-                <p className="text-sm text-gray-600 line-clamp-2">
-                    {taskRule.description}
-                </p>
+                <p className="text-sm text-gray-600 line-clamp-2">{taskRule.description}</p>
                 <p className="text-xs text-gray-500 mt-1">
                     频率:{' '}
                     {taskRule.frequency === 'daily'
@@ -43,12 +35,7 @@ const TaskRuleCard = ({ taskRule, onEdit, onDelete }) => {
                 <Button size="sm" variant="ghost" onClick={handleEdit}>
                     <IconPencil className="w-4 h-4" />
                 </Button>
-                <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-destructive"
-                    onClick={handleDelete}
-                >
+                <Button size="sm" variant="ghost" className="text-destructive" onClick={handleDelete}>
                     <IconTrash className="w-4 h-4" />
                 </Button>
             </CardFooter>
