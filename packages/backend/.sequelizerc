@@ -1,0 +1,8 @@
+const path = require('path');
+
+module.exports = {
+  'config': path.resolve('database', 'config', 'config.json'), // 或 config.json
+  'models-path': path.resolve('database', 'models'),
+  'migrations-path': path.resolve('database', 'migrations'),
+  'seeders-path': path.resolve('database', 'seeders'), // 如果有 seeders 文件夹
+};

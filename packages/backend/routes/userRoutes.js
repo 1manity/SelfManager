@@ -8,9 +8,11 @@ dotenv.config(); // 加载 .env 文件中的环境变量
 const ApiResponse = require('../utils/ApiResponse'); // 引入 ApiResponse 类
 
 // 创建用户
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', async (req, res) => {
     const { username, password } = req.body;
     try {
+        console.error(username, password);
+
         const user = await UserService.createUser(username, password);
         res.status(201).json(ApiResponse.success('用户创建成功', user));
     } catch (error) {
@@ -29,7 +31,11 @@ router.post('/login', async (req, res) => {
 
         // 使用环境变量来管理 JWT 的 secret key
         const secretKey = process.env.JWT_SECRET_KEY;
-        const token = jwt.sign({ id: user.id, username: user.username }, secretKey, { expiresIn: '1h' });
+        const token = jwt.sign(
+            { id: user.id, username: user.username, avatar: user.avatar, nickname: user.nickname, bio: user.bio },
+            secretKey,
+            { expiresIn: '1h' }
+        );
 
         res.json(ApiResponse.success('登录成功', { token }));
     } catch (error) {
@@ -65,6 +71,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
 router.put('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
+    console.log(updates);
     try {
         const user = await UserService.updateUser(id, updates);
         if (!user) {

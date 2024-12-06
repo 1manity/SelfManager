@@ -2,6 +2,7 @@
 
 const { Model } = require('sequelize');
 const bcrypt = require('bcrypt');
+const { getDefaultAvatarUrl } = require('../../utils/avatar.js'); // 导入工具函数
 
 module.exports = (sequelize, DataTypes) => {
     class User extends Model {
@@ -15,7 +16,6 @@ module.exports = (sequelize, DataTypes) => {
             username: {
                 type: DataTypes.STRING,
                 allowNull: false, // 禁止为 NULL
-                unique: true, // 唯一字段
                 validate: {
                     len: [3, 50], // 用户名长度限制
                 },
@@ -27,14 +27,10 @@ module.exports = (sequelize, DataTypes) => {
             avatar: {
                 type: DataTypes.STRING, // 存储头像的URL
                 allowNull: true, // 头像可以为空
-                validate: {
-                    isUrl: true, // 验证是否为有效的URL
-                },
             },
             nickname: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                unique: true, // 如果需要唯一的昵称
                 validate: {
                     len: [2, 30], // 设置昵称长度限制
                 },
@@ -55,14 +51,36 @@ module.exports = (sequelize, DataTypes) => {
             hooks: {
                 // Sequelize 钩子：在保存数据前对密码进行加密
                 beforeCreate: async (user) => {
-                    user.password = await bcrypt.hash(user.password, 10);
+                    if (user.password) {
+                        user.password = await bcrypt.hash(user.password, 10);
+                    }
+                    // 处理默认头像
+                    if (!user.avatar || user.avatar.trim() === '') {
+                        const nameForAvatar = user.nickname || user.username;
+                        user.avatar = getDefaultAvatarUrl(nameForAvatar, 100);
+                    }
                 },
                 beforeUpdate: async (user) => {
                     if (user.changed('password')) {
                         user.password = await bcrypt.hash(user.password, 10);
                     }
+                    // 处理默认头像
+                    if (user.changed('avatar') && (!user.avatar || user.avatar.trim() === '')) {
+                        const nameForAvatar = user.nickname || user.username;
+                        user.avatar = getDefaultAvatarUrl(nameForAvatar, 100);
+                        console.log(user.avatar);
+                    }
                 },
             },
+            indexes: [
+                // 明确管理索引，避免自动创建过多索引
+                {
+                    unique: true,
+                    fields: ['username'],
+                    name: 'idx_users_username_unique',
+                },
+                // 如果有其他需要的索引，可以在这里添加
+            ],
         }
     );
     // 关联任务：一个用户有多个任务

@@ -4,8 +4,32 @@ import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar.jsx';
 import { cn } from '@/lib/utils.js';
 import { IconArrowLeft, IconBrandTabler, IconSettings, IconUserBolt, IconChecklist } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useEffect } from 'react';
+
+// 手动解码 JWT 的辅助函数
+const decodeJWT = (token) => {
+    try {
+        const payloadBase64 = token.split('.')[1];
+        const payload = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
+        return JSON.parse(decodeURIComponent(payload));
+    } catch (error) {
+        console.error('Error decoding JWT:', error);
+        return null;
+    }
+};
 
 const Layout = () => {
+    const [user, setUser] = useState({});
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decodedToken = decodeJWT(token);
+            if (decodedToken) {
+                setUser(decodedToken);
+                console.log('Decoded JWT:', decodedToken);
+            }
+        }
+    }, []);
     const links = [
         {
             label: 'Dashboard',
@@ -24,7 +48,7 @@ const Layout = () => {
         },
         {
             label: 'Logout',
-            href: '#',
+            href: '/login',
             icon: <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
         },
     ];
@@ -49,11 +73,11 @@ const Layout = () => {
                     <div>
                         <SidebarLink
                             link={{
-                                label: '1manity',
+                                label: user.username,
                                 href: '#',
                                 icon: (
                                     <img
-                                        src="https://1manity.top/10.jpg"
+                                        src={user.avatar}
                                         className="h-7 w-7 flex-shrink-0 rounded-full"
                                         width={50}
                                         height={50}

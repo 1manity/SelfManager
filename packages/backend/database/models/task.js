@@ -28,6 +28,11 @@ module.exports = (sequelize, DataTypes) => {
                 values: ['pending', 'in-progress', 'completed'],
                 defaultValue: 'pending', // 默认任务状态为待处理
             },
+            userId: {
+                // 显式定义外键字段
+                type: DataTypes.INTEGER,
+                allowNull: false,
+            },
         },
         {
             sequelize,
@@ -45,8 +50,8 @@ module.exports = (sequelize, DataTypes) => {
         Task.belongsTo(models.User, {
             foreignKey: 'userId', // 明确指定外键名称
             as: 'user',
-            allowNull: false,
             onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
         });
     };
 
