@@ -2,8 +2,8 @@ const { User } = require('../database/models');
 
 const UserService = {
     // 创建用户
-    async createUser(username, password) {
-        const user = await User.create({ username, password });
+    async createUser({ username, password, avatar = null, nickname = null, bio = null }) {
+        const user = await User.create({ username, password, avatar, nickname, bio });
         return user;
     },
     // 获取用户

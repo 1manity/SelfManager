@@ -40,7 +40,7 @@ export default [
                     trailingComma: 'es5',
                     semi: true,
                     tabWidth: 4,
-                    printWidth: 80,
+                    printWidth: 120,
                     arrowParens: 'always',
                 },
             ],

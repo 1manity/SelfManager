@@ -16,10 +16,35 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: false, // 禁止为 NULL
                 unique: true, // 唯一字段
+                validate: {
+                    len: [3, 50], // 用户名长度限制
+                },
             },
             password: {
                 type: DataTypes.STRING,
                 allowNull: false,
+            },
+            avatar: {
+                type: DataTypes.STRING, // 存储头像的URL
+                allowNull: true, // 头像可以为空
+                validate: {
+                    isUrl: true, // 验证是否为有效的URL
+                },
+            },
+            nickname: {
+                type: DataTypes.STRING,
+                allowNull: true,
+                unique: true, // 如果需要唯一的昵称
+                validate: {
+                    len: [2, 30], // 设置昵称长度限制
+                },
+            },
+            bio: {
+                type: DataTypes.TEXT,
+                allowNull: true,
+                validate: {
+                    len: [0, 100], // 设置简介长度限制
+                },
             },
         },
         {
