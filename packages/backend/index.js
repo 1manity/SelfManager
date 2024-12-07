@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const cron = require('node-cron');
+const path = require('path');
 
 const initDatabase = require('./database/initDatabase');
 
@@ -15,7 +16,8 @@ const TaskRuleService = require('./services/taskRuleService'); // 引入 TaskRul
 
 const app = express();
 
-app.use(express.static('uploads'))
+// 配置静态文件中间件
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(cors());
 app.use(express.json()); // 解析 JSON 请求体

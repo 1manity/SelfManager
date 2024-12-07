@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 dotenv.config(); // 加载 .env 文件中的环境变量
 const ApiResponse = require('../utils/ApiResponse'); // 引入 ApiResponse 类
+const { uploadImage } = require('../utils/avatar');
 
 // 创建用户
 router.post('/', async (req, res) => {
@@ -53,9 +54,24 @@ router.get('/', authMiddleware, async (req, res) => {
     }
 });
 
+// 获取自身用户数据
+router.get('/whoami', authMiddleware, async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const user = await UserService.getUserById(userId);
+        if (!user) {
+            return res.status(404).json(ApiResponse.notFound('用户未找到'));
+        }
+        res.json(ApiResponse.success('获取用户成功', user));
+    } catch (error) {
+        res.status(400).json(ApiResponse.error(error.message));
+    }
+});
+
 // 获取单个用户
 router.get('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
+    const userId = req.user.id;
     try {
         const user = await UserService.getUserById(id);
         if (!user) {
@@ -89,6 +105,37 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         await UserService.deleteUser(id);
         res.status(200).json(ApiResponse.noContent('用户删除成功'));
+    } catch (error) {
+        res.status(400).json(ApiResponse.error(error.message));
+    }
+});
+
+// 上传用户头像
+router.post('/:id/avatar', authMiddleware, uploadImage.single('avatar'), async (req, res) => {
+    const { id } = req.params;
+    const authenticatedUser = req.user;
+
+    try {
+        // 确保当前用户是自己或者是管理员
+        if (authenticatedUser.id != id) {
+            return res.status(403).json(ApiResponse.error('禁止上传其他用户的头像'));
+        }
+
+        if (!req.file) {
+            return res.status(400).json(ApiResponse.error('未上传文件'));
+        }
+
+        // 构建头像URL
+        const avatarUrl = `${req.protocol}://${req.get('host')}/uploads/avatars/${req.file.filename}`;
+
+        // 更新用户的头像URL
+        const user = await UserService.updateUser(id, { avatar: avatarUrl });
+
+        if (!user) {
+            return res.status(404).json(ApiResponse.notFound('用户未找到'));
+        }
+
+        res.json(ApiResponse.success('头像上传成功', { avatar: avatarUrl }));
     } catch (error) {
         res.status(400).json(ApiResponse.error(error.message));
     }
