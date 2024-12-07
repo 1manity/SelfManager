@@ -90,7 +90,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 
         // 执行删除
         await TaskService.deleteTask(id);
-        res.status(204).json(ApiResponse.noContent('任务删除成功'));
+        res.status(200).json(ApiResponse.noContent('任务删除成功'));
     } catch (err) {
         res.status(400).json(ApiResponse.error(err.message));
     }

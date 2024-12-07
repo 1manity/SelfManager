@@ -126,7 +126,8 @@ export default function Task() {
             updateTaskStatus(taskId, newStatus).then((res) => {
                 if (res.code === 200) {
                     toast({ title: '任务状态更新成功😃' });
-                    setTasks(tasks.map((task) => (task.id === editingTask.id ? res.data : task)));
+                    console.log(tasks, res.data);
+                    setTasks(tasks.map((task) => (task.id === res.data.id ? res.data : task)));
                 }
             });
         } catch (error) {
