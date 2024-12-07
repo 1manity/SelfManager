@@ -61,7 +61,7 @@ export default function Profile() {
                             onChange={(e) => setBio(e.target.value)}
                             placeholder="简单介绍一下你自己"
                             rows={16}
-                            className="w-96"
+                            className="w-96 h-48"
                         />
                         <p className="text-sm text-gray-500 text-right">{bio.length} / 200</p>
                     </div>
