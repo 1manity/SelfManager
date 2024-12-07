@@ -1,10 +1,14 @@
 import './App.css';
+
 import Home from './pages/home/index.jsx';
 import Login from './pages/login/index.jsx';
-import { Route, Routes } from 'react-router-dom';
 import Dashboard from './pages/dashboard/index.jsx';
 import Task from './pages/task/index.jsx';
+import Setting from './pages/setting/index.jsx';
+import Profile from './pages/setting/profile';
 import Layout from './components/layout/index.jsx';
+
+import { Route, Routes } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 
 function App() {
@@ -18,6 +22,11 @@ function App() {
                 <Route path="/" element={<PrivateRoute element={<Layout />} />}>
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="tasks" element={<Task />} />
+                    <Route path="setting" element={<Setting />}>
+                        <Route path="" element={<Profile />}></Route>
+                        <Route path="preference" element={<div>preference</div>}></Route>
+                        <Route path="data" element={<div>data</div>}></Route>
+                    </Route>
                 </Route>
             </Routes>
         </div>
