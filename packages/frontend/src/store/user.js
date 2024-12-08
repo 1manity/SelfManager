@@ -12,7 +12,12 @@ export const userSlice = createSlice({
         clearUser: (state) => {
             state.user = null;
         },
+        setUserAvatar: (state, action) => {
+            if (state.user) {
+                state.user.avatar = action.payload;
+            }
+        },
     },
 });
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser, clearUser, setUserAvatar } = userSlice.actions;
 export default userSlice.reducer;

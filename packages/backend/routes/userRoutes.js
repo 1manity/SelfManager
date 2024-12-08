@@ -38,7 +38,7 @@ router.post('/login', async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        res.json(ApiResponse.success('登录成功', { token }));
+        res.json(ApiResponse.success('登录成功', { user, token }));
     } catch (error) {
         res.status(400).json(ApiResponse.error(error.message));
     }

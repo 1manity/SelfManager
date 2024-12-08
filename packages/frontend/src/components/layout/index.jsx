@@ -4,7 +4,7 @@ import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar.jsx';
 import { cn } from '@/lib/utils.js';
 import { IconArrowLeft, IconBrandTabler, IconSettings, IconUserBolt, IconChecklist } from '@tabler/icons-react';
 import { useState } from 'react';
-import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 // 手动解码 JWT 的辅助函数
 const decodeJWT = (token) => {
@@ -19,17 +19,7 @@ const decodeJWT = (token) => {
 };
 
 const Layout = () => {
-    const [user, setUser] = useState({});
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            const decodedToken = decodeJWT(token);
-            if (decodedToken) {
-                setUser(decodedToken);
-                console.log('Decoded JWT:', decodedToken);
-            }
-        }
-    }, []);
+    const user = useSelector((state) => state.user.user)
     const links = [
         {
             label: 'Dashboard',
@@ -73,7 +63,7 @@ const Layout = () => {
                     <div>
                         <SidebarLink
                             link={{
-                                label: user.username,
+                                label: user.nickname,
                                 href: '#',
                                 icon: (
                                     <img

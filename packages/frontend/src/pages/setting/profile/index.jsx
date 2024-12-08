@@ -9,42 +9,45 @@ import { useEffect } from 'react';
 import { updateUser, uploadAvatar, whoami } from '@/api/user/index';
 import { useToast } from '@/hooks/use-toast';
 import { useRef } from 'react';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { setUser, setUserAvatar } from '@/store/user';
 
 export default function Profile() {
+    const dispatch = useDispatch();
+
+    const user = useSelector((state) => state.user.user);
+
+    // 本地状态管理表单输入
     const [nickname, setNickname] = useState('');
     const [bio, setBio] = useState('');
     const [avatar, setAvatar] = useState('');
-    const [userId, setUserId] = useState('');
+
     const { toast } = useToast();
 
     const fileInput = useRef(null);
 
     useEffect(() => {
-        try {
-            whoami().then((res) => {
-                setNickname(res.data.nickname);
-                setBio(res.data.bio);
-                setAvatar(res.data.avatar);
-                setUserId(res.data.id);
-            });
-        } catch (error) {
-            console.log(error);
+        if (user) {
+            setNickname(user.nickname || '');
+            setBio(user.bio || '');
+            setAvatar(user.avatar || '');
         }
-    }, []);
+    }, [user]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
         // Handle form submission here
         try {
-            const res = updateUser(userId, {
+            const res = updateUser(user.id, {
                 nickname,
                 bio,
             }).then((res) => {
                 if (res.code === 200) {
+                    dispatch(setUser(res.data));
                     toast({
                         title: '更新成功😃',
                     });
-                    setNickname(res.data.nickname);
-                    setBio(res.data.bio);
                 }
             });
         } catch (error) {
@@ -59,9 +62,9 @@ export default function Profile() {
         formData.append('avatar', file);
 
         try {
-            const res = await uploadAvatar(userId, formData);
+            const res = await uploadAvatar(user.id, formData);
             if (res.code === 200) {
-                setAvatar(res.data.avatar); // Assuming the API returns the new avatar URL
+                dispatch(setUserAvatar(res.data.avatar));
                 toast({
                     title: '头像上传成功😃',
                 });

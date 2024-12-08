@@ -7,9 +7,12 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { login } from '@/api/user/auth.js';
 import { useToast } from '@/hooks/use-toast.js';
 import { ToastAction } from '@/components/ui/toast.jsx';
+import { useDispatch } from 'react-redux';
+import { setUser } from '@/store/user';
 
 export default function Login() {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const { toast } = useToast();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -25,6 +28,7 @@ export default function Login() {
                 console.log(res);
                 if (res.code === 200) {
                     navigate('/dashboard');
+                    dispatch(setUser(res.data.user));
                     toast({
                         title: '登录成功😀',
                     });
