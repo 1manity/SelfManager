@@ -3,7 +3,15 @@ import { createSlice } from '@reduxjs/toolkit';
 export const userSlice = createSlice({
     name: 'user',
     initialState: {
-        user: null, // 初始状态为 null，表示未登录
+        user: {
+            id: null,
+            username: '',
+            avatar: '',
+            nickname: '',
+            bio: '',
+            createdAt: '',
+            updatedAt: '',
+        }, // 初始状态为 null，表示未登录
     },
     reducers: {
         setUser: (state, action) => {

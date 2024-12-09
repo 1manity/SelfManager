@@ -6,18 +6,6 @@ import { IconArrowLeft, IconBrandTabler, IconSettings, IconUserBolt, IconCheckli
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
-// 手动解码 JWT 的辅助函数
-const decodeJWT = (token) => {
-    try {
-        const payloadBase64 = token.split('.')[1];
-        const payload = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
-        return JSON.parse(decodeURIComponent(payload));
-    } catch (error) {
-        console.error('Error decoding JWT:', error);
-        return null;
-    }
-};
-
 const Layout = () => {
     const user = useSelector((state) => state.user.user)
     const links = [

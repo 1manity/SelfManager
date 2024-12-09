@@ -1,47 +1,41 @@
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from './store/user'; // 确保路径正确
+
 import './App.css';
-
-import Home from './pages/home/index.jsx';
-import Login from './pages/login/index.jsx';
-import Dashboard from './pages/dashboard/index.jsx';
-import Task from './pages/task/index.jsx';
-import Setting from './pages/setting/index.jsx';
-import Profile from './pages/setting/profile';
-import Layout from './components/layout/index.jsx';
-
-import { Route, Routes } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
+import AppRoutes from './routes';
+import { whoami } from './api/user';
 
 function App() {
-    
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user.user);
+
+    useEffect(() => {
+        const initializeUser = async () => {
+            try {
+                const res = await whoami();
+                if (res.code === 200) {
+                    console.log(res);
+                    dispatch(setUser(res.data)); // 假设 res.data 包含用户信息
+                } else {
+                    throw new Error(res.message);
+                }
+            } catch (error) {
+                console.error('初始化用户信息失败:', error);
+            }
+        };
+
+        if (user.id === null) {
+            // 仅在用户未初始化时调用
+            initializeUser();
+        }
+    }, [dispatch, user]);
+
     return (
         <div className={'min-h-screen'}>
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="login" element={<Login />} />
-
-                {/* 使用 Layout 作为父路由，嵌套其他路由 */}
-                <Route path="/" element={<PrivateRoute element={<Layout />} />}>
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="tasks" element={<Task />} />
-                    <Route path="setting" element={<Setting />}>
-                        <Route path="" element={<Profile />}></Route>
-                        <Route path="preference" element={<div>preference</div>}></Route>
-                        <Route path="data" element={<div>data</div>}></Route>
-                    </Route>
-                </Route>
-            </Routes>
+            <AppRoutes></AppRoutes>
         </div>
     );
 }
-
-// 假设有一个函数可以检查用户是否已登录
-const isAuthenticated = () => {
-    // 这里可以根据实际情况来检查用户是否已登录
-    return localStorage.getItem('token') !== null;
-};
-
-const PrivateRoute = ({ element, ...rest }) => {
-    return isAuthenticated() ? element : <Navigate to="/login" />;
-};
 
 export default App;
