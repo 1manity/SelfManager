@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const ApiResponse = require('../utils/ApiResponse');
 dotenv.config(); // 加载.env文件中的环境变量
 
 const authMiddleware = (req, res, next) => {
@@ -7,9 +8,7 @@ const authMiddleware = (req, res, next) => {
     // console.log("DEBUG :: authMiddleware" + authHeader)
     // 检查是否有 Authorization 头
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res
-            .status(401)
-            .json({ message: 'Unauthorized: No token provided' });
+        return res.json(ApiResponse.error('未提供有效的令牌'));
     }
 
     // 提取令牌
@@ -21,7 +20,7 @@ const authMiddleware = (req, res, next) => {
         req.user = decoded; // 将解码后的用户信息挂载到请求对象上
         next(); // 继续执行下一个中间件
     } catch (err) {
-        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        return res.json(ApiResponse.error(err.message));
     }
 };
 

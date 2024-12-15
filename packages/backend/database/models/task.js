@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
                 values: ['pending', 'in-progress', 'completed'],
                 defaultValue: 'pending', // 默认任务状态为待处理
             },
+            completedAt: {
+                type: DataTypes.DATE,
+                allowNull: true, // 完成时间可以为空
+            },
             userId: {
                 // 显式定义外键字段
                 type: DataTypes.INTEGER,

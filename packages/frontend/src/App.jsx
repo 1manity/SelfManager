@@ -15,7 +15,6 @@ function App() {
             try {
                 const res = await whoami();
                 if (res.code === 200) {
-                    console.log(res);
                     dispatch(setUser(res.data)); // 假设 res.data 包含用户信息
                 } else {
                     throw new Error(res.message);

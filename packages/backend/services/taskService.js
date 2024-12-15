@@ -56,6 +56,13 @@ const TaskService = {
         const task = await Task.findByPk(taskId);
         if (!task) throw new Error('Task not found');
         task.status = status;
+
+        if (status === 'completed') {
+            task.completedAt = new Date(); // 当前时间
+        } else {
+            task.completedAt = null; // 如果任务状态不是 completed，清空 completedAt
+        }
+
         await task.save();
         return task;
     },

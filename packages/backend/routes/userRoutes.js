@@ -64,7 +64,7 @@ router.get('/whoami', authMiddleware, async (req, res) => {
         }
         res.json(ApiResponse.success('获取用户成功', user));
     } catch (error) {
-        res.status(400).json(ApiResponse.error(error.message));
+        res.json(ApiResponse.error(error.message));
     }
 });
 

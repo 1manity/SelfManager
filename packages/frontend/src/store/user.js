@@ -11,7 +11,7 @@ export const userSlice = createSlice({
             bio: '',
             createdAt: '',
             updatedAt: '',
-        }, // 初始状态为 null，表示未登录
+        },
     },
     reducers: {
         setUser: (state, action) => {
