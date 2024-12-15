@@ -19,7 +19,7 @@ const UserService = {
     // 更新用户
     async updateUser(userId, updates) {
         const user = await User.findByPk(userId);
-        if (!user) throw new Error('User not found');
+        if (!user) throw new Error('用户未找到');
         await user.update(updates);
         return user;
     },
@@ -27,7 +27,7 @@ const UserService = {
     // 删除用户
     async deleteUser(userId) {
         const user = await User.findByPk(userId);
-        if (!user) throw new Error('User not found');
+        if (!user) throw new Error('用户未找到');
         await user.destroy();
     },
 

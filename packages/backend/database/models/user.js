@@ -42,6 +42,10 @@ module.exports = (sequelize, DataTypes) => {
                     len: [0, 100], // 设置简介长度限制
                 },
             },
+            role: {
+                type: DataTypes.ENUM('admin', 'user'),
+                defaultValue: 'user', // 默认角色为 'user'
+            },
         },
         {
             sequelize,

@@ -7,6 +7,7 @@ const dotenv = require('dotenv');
 dotenv.config(); // 加载 .env 文件中的环境变量
 const ApiResponse = require('../utils/ApiResponse'); // 引入 ApiResponse 类
 const { uploadImage } = require('../utils/avatar');
+const authAdminMiddleware = require('../middlewares/authAdminMiddleware');
 
 // 创建用户
 router.post('/', async (req, res) => {
@@ -32,11 +33,9 @@ router.post('/login', async (req, res) => {
 
         // 使用环境变量来管理 JWT 的 secret key
         const secretKey = process.env.JWT_SECRET_KEY;
-        const token = jwt.sign(
-            { id: user.id, username: user.username, avatar: user.avatar, nickname: user.nickname, bio: user.bio },
-            secretKey,
-            { expiresIn: '1h' }
-        );
+        const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, secretKey, {
+            expiresIn: '1h',
+        });
 
         res.json(ApiResponse.success('登录成功', { user, token }));
     } catch (error) {
@@ -45,7 +44,7 @@ router.post('/login', async (req, res) => {
 });
 
 // 获取所有用户
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, authAdminMiddleware, async (req, res) => {
     try {
         const users = await UserService.getAllUsers();
         res.json(ApiResponse.success('获取用户列表成功', users));
@@ -69,7 +68,7 @@ router.get('/whoami', authMiddleware, async (req, res) => {
 });
 
 // 获取单个用户
-router.get('/:id', authMiddleware, async (req, res) => {
+router.get('/:id', authMiddleware, authAdminMiddleware, async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
     try {
@@ -100,7 +99,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 });
 
 // 删除用户
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, authAdminMiddleware, async (req, res) => {
     const { id } = req.params;
     try {
         await UserService.deleteUser(id);
