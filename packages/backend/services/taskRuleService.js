@@ -4,10 +4,7 @@ const { Op } = require('sequelize');
 
 const TaskRuleService = {
     // 创建规则任务
-    async createTaskRule(
-        userId,
-        { title, description, frequency, daysOfWeek, timeOfDay }
-    ) {
+    async createTaskRule(userId, { title, description, frequency, daysOfWeek, timeOfDay }) {
         // 检查用户是否存在
         const user = await User.findByPk(userId);
         if (!user) throw new Error('用户未找到');
@@ -84,9 +81,9 @@ const TaskRuleService = {
     },
 
     // 更新规则任务
-    async updateTaskRule(taskRuleId, userId, updates) {
+    async updateTaskRule(taskRuleId, updates) {
         const taskRule = await TaskRule.findOne({
-            where: { id: taskRuleId, userId },
+            where: { id: taskRuleId },
         });
         if (!taskRule) throw new Error('规则任务未找到');
 
@@ -138,9 +135,9 @@ const TaskRuleService = {
     },
 
     // 删除规则任务
-    async deleteTaskRule(taskRuleId, userId) {
+    async deleteTaskRule(taskRuleId) {
         const taskRule = await TaskRule.findOne({
-            where: { id: taskRuleId, userId },
+            where: { id: taskRuleId },
         });
         if (!taskRule) throw new Error('规则任务未找到');
         await taskRule.destroy();
@@ -174,9 +171,7 @@ const TaskRuleService = {
                 nextRun.setDate(nextRun.getDate() + 1);
             } else if (rule.frequency === 'weekly') {
                 if (!rule.daysOfWeek || rule.daysOfWeek.length === 0) {
-                    console.error(
-                        `RecurringTask ID ${rule.id} 没有指定执行的星期几`
-                    );
+                    console.error(`RecurringTask ID ${rule.id} 没有指定执行的星期几`);
                     continue;
                 }
                 const currentDay = rule.nextRun.getDay();

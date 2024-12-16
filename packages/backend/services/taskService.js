@@ -1,4 +1,5 @@
 const { Task, User } = require('../database/models');
+const { Op } = require('sequelize');
 
 const TaskService = {
     // 创建任务
@@ -65,6 +66,23 @@ const TaskService = {
 
         await task.save();
         return task;
+    },
+    // 获取指定用户的所有未截止任务
+    async getUserActiveTasks(userId) {
+        const user = await User.findByPk(userId, {
+            include: [
+                {
+                    model: Task,
+                    as: 'tasks',
+                    where: {
+                        dueDate: { [Op.gte]: new Date() }, // 筛选未过期的任务
+                        status: { [Op.ne]: 'completed' }, // 可选：排除已完成的任务
+                    },
+                },
+            ],
+        });
+        if (!user) throw new Error('User not found');
+        return user.tasks; // 返回该用户的未截止任务列表
     },
 };
 
