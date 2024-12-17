@@ -15,10 +15,10 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         const ext = path.extname(file.originalname).toLowerCase();
         cb(null, `avatar-${uniqueSuffix}${ext}`);
-    }
+    },
 });
 
 // 文件过滤器，确保只上传图片
@@ -36,7 +36,7 @@ const fileFilter = (req, file, cb) => {
 const uploadImage = multer({
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 限制文件大小为5MB
-    fileFilter: fileFilter
+    fileFilter: fileFilter,
 });
 const getDefaultAvatarUrl = (name, size = 100) => {
     if (!name) {

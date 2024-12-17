@@ -98,6 +98,19 @@ module.exports = (sequelize, DataTypes) => {
             as: 'taskRules', // 可以通过 `taskRules` 访问该用户的所有任务规则
             onDelete: 'CASCADE',
         });
+        // 一个用户有多个项目（作为参与者）
+        User.belongsToMany(models.Project, {
+            through: models.ProjectUser, // 关联表
+            foreignKey: 'userId',
+            otherKey: 'projectId',
+            as: 'projects',
+        });
+        // 一个用户可以创建多个项目
+        User.hasMany(models.Project, {
+            foreignKey: 'creatorId',
+            as: 'createdProjects',
+            onDelete: 'SET NULL',
+        });
     };
     return User;
 };

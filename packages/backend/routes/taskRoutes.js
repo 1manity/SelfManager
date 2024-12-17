@@ -107,4 +107,3 @@ async function checkTaskPermission(req, res, next) {
         res.status(400).json(ApiResponse.error(err.message));
     }
 }
-
