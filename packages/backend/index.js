@@ -9,6 +9,10 @@ const userRoutes = require('./routes/userRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const taskRuleRoutes = require('./routes/taskRuleRoutes');
 const uploadRoutes = require('./routes/upload');
+const projectRoutes = require('./routes/projectRoutes');
+const versionRoutes = require('./routes/versionRoutes');
+const requirementRoutes = require('./routes/requirementRoutes');
+const defectRoutes = require('./routes/defectRoutes');
 
 const ApiResponse = require('./utils/ApiResponse'); // 引入 ApiResponse 类
 
@@ -25,6 +29,14 @@ app.use('/users', userRoutes); // 挂载用户路由
 app.use('/tasks', taskRoutes); // 挂载用户路由
 app.use('/task-rules', taskRuleRoutes); // 挂载用户路由
 app.use('/upload', uploadRoutes);
+// 项目路由
+app.use('/projects', projectRoutes);
+// 版本路由
+app.use('/versions', versionRoutes);
+// 需求路由
+app.use('/requirements', requirementRoutes);
+// 缺陷路由
+app.use('/defects', defectRoutes);
 
 // 定时任务，每分钟检查一次
 cron.schedule('* * * * *', async () => {
@@ -48,8 +60,3 @@ const startServer = async () => {
 };
 
 startServer();
-// {
-//     "code": <number>,
-//     "message": <string>,
-//     "data": <object | array>,
-// }
