@@ -10,7 +10,7 @@ const ApiResponse = require('../utils/ApiResponse');
 // 创建项目
 router.post('/', authMiddleware, async (req, res) => {
     try {
-        const { name, description, startDate, endDate, status, userIds } = req.body;
+        const { name, description, startDate, endDate, status, userIds = [] } = req.body;
         const creatorId = req.user.id; // 假设通过认证中间件获取当前用户
         const project = await ProjectService.createProject({
             name,

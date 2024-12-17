@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
 const Layout = () => {
-    const user = useSelector((state) => state.user.user)
+    const user = useSelector((state) => state.user.user);
     const links = [
         {
             label: 'Dashboard',
