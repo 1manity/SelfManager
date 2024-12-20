@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar.jsx';
 import { cn } from '@/lib/utils.js';
-import { IconArrowLeft, IconBrandTabler, IconSettings, IconUserBolt, IconChecklist } from '@tabler/icons-react';
+import { IconArrowLeft, IconBrandTabler, IconSettings, IconBorderAll, IconChecklist } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -10,22 +10,27 @@ const Layout = () => {
     const user = useSelector((state) => state.user.user);
     const links = [
         {
-            label: 'Dashboard',
+            label: '仪表盘',
             href: '/dashboard',
             icon: <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
         },
         {
-            label: 'Tasks',
+            label: '任务',
             href: 'tasks',
             icon: <IconChecklist className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
         },
         {
-            label: 'Settings',
+            label: '项目',
+            href: '/projects',
+            icon: <IconBorderAll className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
+        },
+        {
+            label: '设置',
             href: '/setting/',
             icon: <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
         },
         {
-            label: 'Logout',
+            label: '登出',
             href: '/login',
             icon: <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
         },
