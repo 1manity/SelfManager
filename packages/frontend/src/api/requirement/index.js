@@ -1,5 +1,4 @@
 import request from '@/api/request';
-import ApiResponse from '@/utils/ApiResponse';
 
 /**
  * 创建新需求
@@ -15,10 +14,10 @@ import ApiResponse from '@/utils/ApiResponse';
 export const createRequirement = async (requirementData) => {
     try {
         const response = await request.post('/requirements', requirementData);
-        return ApiResponse.success('需求创建成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('创建需求失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -29,10 +28,10 @@ export const createRequirement = async (requirementData) => {
 export const getAllRequirements = async () => {
     try {
         const response = await request.get('/requirements');
-        return ApiResponse.success('获取需求列表成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('获取需求列表失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -44,10 +43,10 @@ export const getAllRequirements = async () => {
 export const getRequirementById = async (requirementId) => {
     try {
         const response = await request.get(`/requirements/${requirementId}`);
-        return ApiResponse.success('获取需求成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('获取需求失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -59,10 +58,10 @@ export const getRequirementById = async (requirementId) => {
 export const getRequirementsByVersionId = async (versionId) => {
     try {
         const response = await request.get(`/requirements/version/${versionId}`);
-        return ApiResponse.success('获取版本需求成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('获取版本需求失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -75,10 +74,10 @@ export const getRequirementsByVersionId = async (versionId) => {
 export const updateRequirement = async (requirementId, updates) => {
     try {
         const response = await request.put(`/requirements/${requirementId}`, updates);
-        return ApiResponse.success('需求更新成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('更新需求失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -90,9 +89,9 @@ export const updateRequirement = async (requirementId, updates) => {
 export const deleteRequirement = async (requirementId) => {
     try {
         const response = await request.delete(`/requirements/${requirementId}`);
-        return ApiResponse.noContent('需求删除成功');
+        return response;
     } catch (error) {
         console.error('删除需求失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };

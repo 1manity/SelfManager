@@ -1,5 +1,4 @@
 import request from '@/api/request';
-import ApiResponse from '@/utils/ApiResponse';
 
 /**
  * 创建新项目
@@ -15,10 +14,10 @@ import ApiResponse from '@/utils/ApiResponse';
 export const createProject = async (projectData) => {
     try {
         const response = await request.post('/projects', projectData);
-        return ApiResponse.success('项目创建成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('创建项目失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -29,10 +28,10 @@ export const createProject = async (projectData) => {
 export const getAllProjects = async () => {
     try {
         const response = await request.get('/projects');
-        return ApiResponse.success('获取项目列表成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('获取项目列表失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -44,10 +43,10 @@ export const getAllProjects = async () => {
 export const getProjectById = async (projectId) => {
     try {
         const response = await request.get(`/projects/${projectId}`);
-        return ApiResponse.success('获取项目成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('获取项目失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -60,10 +59,10 @@ export const getProjectById = async (projectId) => {
 export const updateProject = async (projectId, updates) => {
     try {
         const response = await request.put(`/projects/${projectId}`, updates);
-        return ApiResponse.success('项目更新成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('更新项目失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -75,10 +74,10 @@ export const updateProject = async (projectId, updates) => {
 export const deleteProject = async (projectId) => {
     try {
         const response = await request.delete(`/projects/${projectId}`);
-        return ApiResponse.noContent('项目删除成功');
+        return response;
     } catch (error) {
         console.error('删除项目失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -91,10 +90,10 @@ export const deleteProject = async (projectId) => {
 export const addUserToProject = async (projectId, userId) => {
     try {
         const response = await request.post(`/projects/${projectId}/add-user`, { userId });
-        return ApiResponse.success('用户已成功添加到项目', response.data.data);
+        return response;
     } catch (error) {
         console.error('添加用户到项目失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -107,10 +106,10 @@ export const addUserToProject = async (projectId, userId) => {
 export const removeUserFromProject = async (projectId, userId) => {
     try {
         const response = await request.post(`/projects/${projectId}/remove-user`, { userId });
-        return ApiResponse.success('用户已成功从项目中移除', response.data.data);
+        return response;
     } catch (error) {
         console.error('从项目中移除用户失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -122,9 +121,9 @@ export const removeUserFromProject = async (projectId, userId) => {
 export const getProjectUsers = async (projectId) => {
     try {
         const response = await request.get(`/projects/${projectId}/users`);
-        return ApiResponse.success('获取项目用户成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('获取项目用户失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };

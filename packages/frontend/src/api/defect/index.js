@@ -1,5 +1,4 @@
 import request from '@/api/request';
-import ApiResponse from '@/utils/ApiResponse';
 
 /**
  * 创建新缺陷
@@ -15,10 +14,10 @@ import ApiResponse from '@/utils/ApiResponse';
 export const createDefect = async (defectData) => {
     try {
         const response = await request.post('/defects', defectData);
-        return ApiResponse.success('缺陷创建成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('创建缺陷失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -29,10 +28,10 @@ export const createDefect = async (defectData) => {
 export const getAllDefects = async () => {
     try {
         const response = await request.get('/defects');
-        return ApiResponse.success('获取缺陷列表成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('获取缺陷列表失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -44,10 +43,10 @@ export const getAllDefects = async () => {
 export const getDefectById = async (defectId) => {
     try {
         const response = await request.get(`/defects/${defectId}`);
-        return ApiResponse.success('获取缺陷成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('获取缺陷失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -59,10 +58,10 @@ export const getDefectById = async (defectId) => {
 export const getDefectsByVersionId = async (versionId) => {
     try {
         const response = await request.get(`/defects/version/${versionId}`);
-        return ApiResponse.success('获取版本缺陷成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('获取版本缺陷失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -75,10 +74,10 @@ export const getDefectsByVersionId = async (versionId) => {
 export const updateDefect = async (defectId, updates) => {
     try {
         const response = await request.put(`/defects/${defectId}`, updates);
-        return ApiResponse.success('缺陷更新成功', response.data.data);
+        return response;
     } catch (error) {
         console.error('更新缺陷失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };
 
@@ -90,9 +89,9 @@ export const updateDefect = async (defectId, updates) => {
 export const deleteDefect = async (defectId) => {
     try {
         const response = await request.delete(`/defects/${defectId}`);
-        return ApiResponse.noContent('缺陷删除成功');
+        return response;
     } catch (error) {
         console.error('删除缺陷失败:', error.message);
-        return ApiResponse.error(error.message);
+        return error;
     }
 };

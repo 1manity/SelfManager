@@ -1,5 +1,4 @@
 import request from '@/api/request';
-import ApiResponse from '@/utils/ApiResponse';
 
 /**
  * 创建新版本
@@ -14,10 +13,10 @@ import ApiResponse from '@/utils/ApiResponse';
 export const createVersion = async (versionData) => {
     try {
         const response = await request.post('/versions', versionData);
-        return ApiResponse.success('版本创建成功', response.data.data);
+        return response;
     } catch (error) {
-        console.error('创建版本失败:', error.message);
-        return ApiResponse.error(error.message);
+        console.error('创建版本失败:', error);
+        return error;
     }
 };
 
@@ -28,10 +27,10 @@ export const createVersion = async (versionData) => {
 export const getAllVersions = async () => {
     try {
         const response = await request.get('/versions');
-        return ApiResponse.success('获取版本列表成功', response.data.data);
+        return response;
     } catch (error) {
-        console.error('获取版本列表失败:', error.message);
-        return ApiResponse.error(error.message);
+        console.error('获取版本列表失败:', error);
+        return error;
     }
 };
 
@@ -43,10 +42,10 @@ export const getAllVersions = async () => {
 export const getVersionById = async (versionId) => {
     try {
         const response = await request.get(`/versions/${versionId}`);
-        return ApiResponse.success('获取版本成功', response.data.data);
+        return response;
     } catch (error) {
-        console.error('获取版本失败:', error.message);
-        return ApiResponse.error(error.message);
+        console.error('获取版本失败:', error);
+        return error;
     }
 };
 
@@ -58,10 +57,10 @@ export const getVersionById = async (versionId) => {
 export const getVersionsByProjectId = async (projectId) => {
     try {
         const response = await request.get(`/versions/project/${projectId}`);
-        return ApiResponse.success('获取项目版本成功', response.data.data);
+        return response;
     } catch (error) {
-        console.error('获取项目版本失败:', error.message);
-        return ApiResponse.error(error.message);
+        console.error('获取项目版本失败:', error);
+        return error;
     }
 };
 
@@ -74,10 +73,10 @@ export const getVersionsByProjectId = async (projectId) => {
 export const updateVersion = async (versionId, updates) => {
     try {
         const response = await request.put(`/versions/${versionId}`, updates);
-        return ApiResponse.success('版本更新成功', response.data.data);
+        return response;
     } catch (error) {
-        console.error('更新版本失败:', error.message);
-        return ApiResponse.error(error.message);
+        console.error('更新版本失败:', error);
+        return error;
     }
 };
 
@@ -89,9 +88,9 @@ export const updateVersion = async (versionId, updates) => {
 export const deleteVersion = async (versionId) => {
     try {
         const response = await request.delete(`/versions/${versionId}`);
-        return ApiResponse.noContent('版本删除成功');
+        return response;
     } catch (error) {
-        console.error('删除版本失败:', error.message);
-        return ApiResponse.error(error.message);
+        console.error('删除版本失败:', error);
+        return error;
     }
 };
