@@ -4,10 +4,35 @@ import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar.jsx';
 import { cn } from '@/lib/utils.js';
 import { IconArrowLeft, IconBrandTabler, IconSettings, IconBorderAll, IconChecklist } from '@tabler/icons-react';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { setUser } from '@/store/user'; // 确保路径正确
+
+import { whoami } from '@/api/user';
 
 const Layout = () => {
     const user = useSelector((state) => state.user.user);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const initializeUser = async () => {
+            try {
+                const res = await whoami();
+                if (res.code === 200) {
+                    dispatch(setUser(res.data)); // 假设 res.data 包含用户信息
+                } else {
+                    throw new Error(res.message);
+                }
+            } catch (error) {
+                console.error('初始化用户信息失败:', error);
+            }
+        };
+
+        if (user.id === null) {
+            // 仅在用户未初始化时调用
+            initializeUser();
+        }
+    }, [dispatch, user]);
     const links = [
         {
             label: '仪表盘',

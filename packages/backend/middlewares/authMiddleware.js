@@ -20,7 +20,7 @@ const authMiddleware = (req, res, next) => {
         req.user = decoded; // 将解码后的用户信息挂载到请求对象上
         next(); // 继续执行下一个中间件
     } catch (err) {
-        return res.json(ApiResponse.error(err.message));
+        return res.status(401).json(ApiResponse.error(err.message));
     }
 };
 

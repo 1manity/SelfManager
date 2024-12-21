@@ -31,7 +31,7 @@ request.interceptors.response.use(
         if (code === 200) {
             return { code, message, data }; // 只返回必要的数据
         } else {
-            return Promise.reject(new Error(message || 'Unknown error'));
+            throw new Error(message || 'Unknown error');
         }
     },
     (error) => {
