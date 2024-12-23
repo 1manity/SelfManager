@@ -11,8 +11,14 @@ import {
     getProjectUsers,
 } from '@/api/project';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { IconDots } from '@tabler/icons-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { IconPlus, IconDots } from '@tabler/icons-react';
+import { format } from 'date-fns';
 
 const ProjectPage = () => {
     // 状态变量
@@ -180,31 +186,100 @@ const ProjectPage = () => {
         }
     };
 
-    // 返回组件的逻辑部分（不包括 JSX）
+    // Add a new state for the create project dialog
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+    // ... (keep the existing useEffect and handler functions)
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewProject((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleStatusChange = (value) => {
+        setNewProject((prev) => ({ ...prev, status: value }));
+    };
+
+    const handleSubmitNewProject = (e) => {
+        e.preventDefault();
+        handleCreateProject(newProject);
+        setIsCreateDialogOpen(false);
+    };
     return (
         <div className="p-6">
-            <div className="mb-6">
-                <Button>新增项目</Button>
+            <div className="mb-6 flex justify-between items-center">
+                <h1 className="text-2xl font-bold">Projects</h1>
+                <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button>
+                            <IconPlus className="h-4 w-4" /> 新建项目
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>新建项目</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleSubmitNewProject} className="space-y-4">
+                            <div>
+                                <Label htmlFor="name">项目名称</Label>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    value={newProject.name}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="description">项目描述</Label>
+                                <Textarea
+                                    id="description"
+                                    name="description"
+                                    value={newProject.description}
+                                    onChange={handleInputChange}
+                                />
+                            </div>
+                            <Button type="submit">创建项目</Button>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </div>
-            <div>
-                <div className="flex flex-col border rounded-md divide-y">
+            {loading ? (
+                <div>Loading projects...</div>
+            ) : error ? (
+                <div className="text-red-500">{error}</div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {projects.map((project) => (
-                        <div key={project.id} className="p-4 flex justify-between items-center w-full">
-                            <div className="font-semibold text-sm w-1/6 truncate overflow-hidden whitespace-nowrap">
-                                {project.name}
-                            </div>
-                            <div className="w-2/4 truncate overflow-hidden whitespace-nowrap text-gray-600 flex-1 text-sm font-medium">
-                                {project.description}
-                            </div>
-                            <div className="w-1/4 flex justify-end">
-                                <Button variant="ghost" className="w-6 h-8">
-                                    <IconDots stroke={2}></IconDots>
-                                </Button>
-                            </div>
-                        </div>
+                        <Card key={project.id}>
+                            <CardContent className="pl-6 pt-5 flex flex-col justify-between ">
+                                <div className="space-y-1 flex items-center justify-between w-full">
+                                    <div className="flex flex-col">
+                                        <h2 className="font-semibold text-sm truncate">{project.name}</h2>
+                                        <div className="text-xs text-gray-400 truncate">{project.status}</div>
+                                    </div>
+
+                                    <div className="flex items-center space-x-2">
+                                        <Button variant="ghost" size="icon">
+                                            <IconDots></IconDots>
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div className="flex items-start my-3">
+                                    <div className="inline-flex items-center px-4 h-6 bg-gray-200 rounded-full font-medium text-sm">
+                                        无关联仓库
+                                    </div>
+                                </div>
+
+                                <p className="text-sm text-gray-500 truncate">{project.description}</p>
+                                <div className="text-xs text-gray-400 truncate">
+                                    {project.startDate && `上次修改: ${format(new Date(project.updatedAt), 'PP')}`}
+                                </div>
+                            </CardContent>
+                        </Card>
                     ))}
                 </div>
-            </div>
+            )}
         </div>
     );
 };
