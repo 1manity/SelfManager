@@ -206,9 +206,9 @@ const ProjectPage = () => {
         setIsCreateDialogOpen(false);
     };
     return (
-        <div className="p-6">
+        <div className="px-12 pt-8 bg-neutral-100 h-screen">
             <div className="mb-6 flex justify-between items-center">
-                <h1 className="text-2xl font-bold">Projects</h1>
+                <h1 className="scroll-m-20 text-2xl font-thin tracking-tight mb-4">项目</h1>
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                     <DialogTrigger asChild>
                         <Button>
@@ -245,7 +245,7 @@ const ProjectPage = () => {
                 </Dialog>
             </div>
             {loading ? (
-                <div>Loading projects...</div>
+                <div>项目加载中...</div>
             ) : error ? (
                 <div className="text-red-500">{error}</div>
             ) : (
