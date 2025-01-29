@@ -2,8 +2,8 @@ const { Project, User, Version } = require('../database/models');
 
 const ProjectService = {
     // 创建项目
-    async createProject({ name, description, startDate, endDate, status, creatorId, userIds = [] }) {
-        const project = await Project.create({ name, description, startDate, endDate, status, creatorId });
+    async createProject({ name, description, startDate, status, creatorId, userIds = [] }) {
+        const project = await Project.create({ name, description, startDate, status, creatorId });
 
         // 添加创建者到项目参与者列表（如果不自动添加）
         if (!userIds.includes(creatorId)) {

@@ -50,10 +50,6 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 defaultValue: DataTypes.NOW,
             },
-            endDate: {
-                type: DataTypes.DATE,
-                allowNull: true,
-            },
             status: {
                 type: DataTypes.ENUM('planning', 'in_progress', 'completed'),
                 defaultValue: 'planning',

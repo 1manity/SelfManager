@@ -15,10 +15,32 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { IconPlus, IconDots } from '@tabler/icons-react';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogDescription,
+} from '@/components/ui/dialog';
+import { IconPlus, IconDots, IconEdit, IconTrash } from '@tabler/icons-react';
 import { format } from 'date-fns';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const ProjectPage = () => {
     // 状态变量
@@ -30,8 +52,7 @@ const ProjectPage = () => {
     const [newProject, setNewProject] = useState({
         name: '',
         description: '',
-        startDate: '',
-        endDate: '',
+        startDate: new Date().toISOString(), // 设置默认开始日期为当前时间
         status: 'planning',
         userIds: [], // 参与项目的用户ID数组
     });
@@ -41,6 +62,14 @@ const ProjectPage = () => {
         projectId: null,
         updates: {},
     });
+
+    // 添加新的状态
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [currentProject, setCurrentProject] = useState(null);
+
+    // 添加删除确认对话框的状态
+    const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+    const [projectToDelete, setProjectToDelete] = useState(null);
 
     // useEffect 用于在组件挂载时获取所有项目数据
     useEffect(() => {
@@ -73,12 +102,11 @@ const ProjectPage = () => {
             const response = await createProject(projectData);
             if (response.code === 200) {
                 setProjects([...projects, response.data]); // 将新项目添加到项目列表中
-                // 清空表单
+                // 清空表单时保持 startDate 为当前时间
                 setNewProject({
                     name: '',
                     description: '',
-                    startDate: '',
-                    endDate: '',
+                    startDate: new Date().toISOString(),
                     status: 'planning',
                     userIds: [],
                 });
@@ -189,7 +217,50 @@ const ProjectPage = () => {
     // Add a new state for the create project dialog
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
-    // ... (keep the existing useEffect and handler functions)
+    // 修改处理删除的函数
+    const handleDeleteClick = (project) => {
+        setProjectToDelete(project);
+        setIsDeleteAlertOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (projectToDelete) {
+            await handleDeleteProject(projectToDelete.id);
+            setIsDeleteAlertOpen(false);
+            setProjectToDelete(null);
+        }
+    };
+
+    // 修改编辑对话框的处理函数
+    const handleEditProject = (project) => {
+        setCurrentProject(project);
+        setIsEditDialogOpen(true);
+    };
+
+    // 添加编辑对话框关闭的处理函数
+    const handleEditDialogClose = () => {
+        setIsEditDialogOpen(false);
+        setCurrentProject(null);
+    };
+
+    const handleUpdateSubmit = (e) => {
+        e.preventDefault();
+        if (currentProject) {
+            handleUpdateProject(currentProject.id, {
+                name: currentProject.name,
+                description: currentProject.description,
+            });
+            setIsEditDialogOpen(false);
+        }
+    };
+
+    const handleEditInputChange = (e) => {
+        const { name, value } = e.target;
+        setCurrentProject((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -218,6 +289,7 @@ const ProjectPage = () => {
                     <DialogContent>
                         <DialogHeader>
                             <DialogTitle>新建项目</DialogTitle>
+                            <DialogDescription>在这里创建一个新的项目。填写项目的基本信息。</DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleSubmitNewProject} className="space-y-4">
                             <div>
@@ -252,7 +324,7 @@ const ProjectPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {projects.map((project) => (
                         <Card key={project.id}>
-                            <CardContent className="pl-6 pt-5 flex flex-col justify-between ">
+                            <CardContent className="pl-6 pt-5 flex flex-col justify-between">
                                 <div className="space-y-1 flex items-center justify-between w-full">
                                     <div className="flex flex-col">
                                         <h2 className="font-semibold text-sm truncate">{project.name}</h2>
@@ -260,9 +332,29 @@ const ProjectPage = () => {
                                     </div>
 
                                     <div className="flex items-center space-x-2">
-                                        <Button variant="ghost" size="icon">
-                                            <IconDots></IconDots>
-                                        </Button>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon">
+                                                    <IconDots className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <div onClick={() => handleEditProject(project)}>
+                                                    <DropdownMenuItem>
+                                                        <IconEdit className="mr-2 h-4 w-4" />
+                                                        <span>修改项目</span>
+                                                    </DropdownMenuItem>
+                                                </div>
+
+                                                <DropdownMenuItem
+                                                    className="text-red-600"
+                                                    onClick={() => handleDeleteClick(project)}
+                                                >
+                                                    <IconTrash className="mr-2 h-4 w-4" />
+                                                    <span>删除项目</span>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
                                 </div>
                                 <div className="flex items-start my-3">
@@ -280,6 +372,54 @@ const ProjectPage = () => {
                     ))}
                 </div>
             )}
+
+            {/* 修改编辑对话框 */}
+            <Dialog open={isEditDialogOpen} onOpenChange={handleEditDialogClose}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>修改项目</DialogTitle>
+                        <DialogDescription>修改项目的名称和描述信息。</DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleUpdateSubmit} className="space-y-4">
+                        <div>
+                            <Label htmlFor="edit-name">项目名称</Label>
+                            <Input
+                                id="edit-name"
+                                name="name"
+                                value={currentProject?.name || ''}
+                                onChange={handleEditInputChange}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="edit-description">项目描述</Label>
+                            <Textarea
+                                id="edit-description"
+                                name="description"
+                                value={currentProject?.description || ''}
+                                onChange={handleEditInputChange}
+                            />
+                        </div>
+                        <Button type="submit">保存修改</Button>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* 添加删除确认对话框 */}
+            <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>确认删除</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            确定要删除项目 "{projectToDelete?.name}" 吗？此操作无法撤销。
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setProjectToDelete(null)}>取消</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmDelete}>确认删除</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };

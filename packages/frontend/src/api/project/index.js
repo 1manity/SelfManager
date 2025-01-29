@@ -5,8 +5,7 @@ import request from '@/api/request';
  * @param {Object} projectData - 项目数据
  * @param {string} projectData.name - 项目名称
  * @param {string} [projectData.description] - 项目描述
- * @param {string} projectData.startDate - 开始日期
- * @param {string} [projectData.endDate] - 结束日期
+ * @param {string} projectData.startDate - 开始日期（ISO 格式的时间字符串）
  * @param {string} [projectData.status] - 项目状态
  * @param {number[]} [projectData.userIds] - 参与项目的用户ID数组
  * @returns {Promise} - 返回创建的项目数据
