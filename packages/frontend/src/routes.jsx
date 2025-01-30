@@ -5,10 +5,11 @@ import Task from './pages/task/index.jsx';
 import Setting from './pages/setting/index.jsx';
 import Profile from './pages/setting/profile';
 import Layout from './components/layout/index.jsx';
+import Project from './pages/project/index.jsx';
+import ProjectDetail from './pages/project/detail/index.jsx';
 
 import { Route, Routes } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
-import Project from './pages/project/index.jsx';
 
 function AppRoutes() {
     return (
@@ -21,6 +22,7 @@ function AppRoutes() {
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="tasks" element={<Task />} />
                 <Route path="projects" element={<Project />} />
+                <Route path="project/detail/:id" element={<ProjectDetail />} />
                 <Route path="setting" element={<Setting />}>
                     <Route path="" element={<Profile />}></Route>
                     <Route path="preference" element={<div>preference</div>}></Route>

@@ -41,8 +41,11 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useNavigate } from 'react-router-dom';
 
 const ProjectPage = () => {
+    const navigate = useNavigate();
+
     // 状态变量
     const [projects, setProjects] = useState([]); // 存储所有项目
     const [loading, setLoading] = useState(false); // 加载状态
@@ -276,6 +279,12 @@ const ProjectPage = () => {
         handleCreateProject(newProject);
         setIsCreateDialogOpen(false);
     };
+
+    // 添加跳转到详情页的处理函数
+    const handleProjectClick = (projectId) => {
+        navigate(`/project/detail/${projectId}`);
+    };
+
     return (
         <div className="px-12 pt-8 bg-neutral-100 h-screen">
             <div className="mb-6 flex justify-between items-center">
@@ -323,7 +332,16 @@ const ProjectPage = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {projects.map((project) => (
-                        <Card key={project.id}>
+                        <Card
+                            key={project.id}
+                            className="cursor-pointer hover:shadow-md transition-shadow"
+                            onClick={(e) => {
+                                // 防止点击操作按钮时触发跳转
+                                if (!e.target.closest('.project-actions')) {
+                                    handleProjectClick(project.id);
+                                }
+                            }}
+                        >
                             <CardContent className="pl-6 pt-5 flex flex-col justify-between">
                                 <div className="space-y-1 flex items-center justify-between w-full">
                                     <div className="flex flex-col">
@@ -331,7 +349,7 @@ const ProjectPage = () => {
                                         <div className="text-xs text-gray-400 truncate">{project.status}</div>
                                     </div>
 
-                                    <div className="flex items-center space-x-2">
+                                    <div className="flex items-center space-x-2 project-actions">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" size="icon">
