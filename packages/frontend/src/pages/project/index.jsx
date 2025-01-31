@@ -336,8 +336,12 @@ const ProjectPage = () => {
                             key={project.id}
                             className="cursor-pointer hover:shadow-md transition-shadow"
                             onClick={(e) => {
-                                // 防止点击操作按钮时触发跳转
-                                if (!e.target.closest('.project-actions')) {
+                                // 检查是否点击了下拉菜单内容
+                                const isDropdownClick = e.target.closest('[role="menuitem"]');
+                                // 检查是否点击了触发器
+                                const isTriggerClick = e.target.closest('[data-state]');
+
+                                if (!isDropdownClick && !isTriggerClick) {
                                     handleProjectClick(project.id);
                                 }
                             }}

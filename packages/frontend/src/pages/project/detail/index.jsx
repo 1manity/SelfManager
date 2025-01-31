@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { createVersion } from '@/api/version';
+import { useToast } from '@/hooks/use-toast';
 
 const ProjectDetail = () => {
     const { id } = useParams();
@@ -26,6 +28,8 @@ const ProjectDetail = () => {
         releaseDate: '',
         status: 'planned',
     });
+
+    const { toast } = useToast();
 
     useEffect(() => {
         const fetchProjectData = async () => {
@@ -51,9 +55,35 @@ const ProjectDetail = () => {
 
     const handleCreateVersion = async (e) => {
         e.preventDefault();
-        // TODO: 实现创建版本的API调用
-        console.log('Creating version:', newVersion);
-        setIsAddVersionOpen(false);
+        try {
+            const versionData = {
+                ...newVersion,
+                projectId: parseInt(id), // 确保 projectId 是数字类型
+            };
+
+            const response = await createVersion(versionData);
+            if (response.code === 200) {
+                toast({ title: '版本创建成功😃' });
+                // 更新项目数据中的版本列表
+                setProject({
+                    ...project,
+                    versions: [...project.versions, response.data],
+                });
+                // 重置表单
+                setNewVersion({
+                    versionNumber: '',
+                    description: '',
+                    releaseDate: '',
+                    status: 'planned',
+                });
+                setIsAddVersionOpen(false);
+            } else {
+                throw new Error(response.message);
+            }
+        } catch (error) {
+            toast({ title: '版本创建失败😢', description: error.message });
+            console.error('版本创建失败:', error);
+        }
     };
 
     const menuItems = [
@@ -145,7 +175,12 @@ const ProjectDetail = () => {
                                     <CardContent className="p-4">
                                         <div className="flex justify-between items-start">
                                             <div>
-                                                <h3 className="font-medium">{version.versionNumber}</h3>
+                                                <div className="flex items-center space-x-2">
+                                                    <h3 className="font-medium">{version.versionNumber}</h3>
+                                                    <span className="text-xs px-2 py-1 rounded-full bg-gray-100">
+                                                        {version.status}
+                                                    </span>
+                                                </div>
                                                 <p className="text-sm text-gray-500 mt-1">{version.description}</p>
                                             </div>
                                             <div className="text-sm text-gray-500">
