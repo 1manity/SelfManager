@@ -7,6 +7,7 @@ import Profile from './pages/setting/profile';
 import Layout from './components/layout/index.jsx';
 import Project from './pages/project/index.jsx';
 import ProjectDetail from './pages/project/detail/index.jsx';
+import VersionDetail from './pages/project/version/index.jsx';
 
 import { Route, Routes } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
@@ -23,6 +24,7 @@ function AppRoutes() {
                 <Route path="tasks" element={<Task />} />
                 <Route path="projects" element={<Project />} />
                 <Route path="project/detail/:id" element={<ProjectDetail />} />
+                <Route path="project/:projectId/version/:versionId" element={<VersionDetail />} />
                 <Route path="setting" element={<Setting />}>
                     <Route path="" element={<Profile />}></Route>
                     <Route path="preference" element={<div>preference</div>}></Route>

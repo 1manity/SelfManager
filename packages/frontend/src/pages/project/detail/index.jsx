@@ -171,7 +171,11 @@ const ProjectDetail = () => {
                         </div>
                         <div className="grid grid-cols-1 gap-4">
                             {project?.versions.map((version) => (
-                                <Card key={version.id} className="hover:shadow-md transition-shadow">
+                                <Card
+                                    key={version.id}
+                                    className="hover:shadow-md transition-shadow cursor-pointer"
+                                    onClick={() => navigate(`/project/${project.id}/version/${version.id}`)}
+                                >
                                     <CardContent className="p-4">
                                         <div className="flex justify-between items-start">
                                             <div>
