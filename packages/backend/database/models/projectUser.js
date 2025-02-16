@@ -32,12 +32,23 @@ module.exports = (sequelize, DataTypes) => {
                 },
                 onDelete: 'CASCADE',
             },
+            role: {
+                type: DataTypes.ENUM('creator', 'manager', 'member'),
+                allowNull: false,
+                defaultValue: 'member',
+            },
+            // 加入时间
+            joinedAt: {
+                type: DataTypes.DATE,
+                allowNull: false,
+                defaultValue: DataTypes.NOW,
+            },
         },
         {
             sequelize,
             modelName: 'ProjectUser',
             tableName: 'ProjectUsers',
-            timestamps: false, // 关联表通常不需要时间戳
+            timestamps: true, // 启用时间戳以跟踪变更
             indexes: [
                 {
                     unique: true,

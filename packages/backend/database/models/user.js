@@ -43,8 +43,8 @@ module.exports = (sequelize, DataTypes) => {
                 },
             },
             role: {
-                type: DataTypes.ENUM('admin', 'user'),
-                defaultValue: 'user', // 默认角色为 'user'
+                type: DataTypes.ENUM('super_admin', 'admin', 'user'),
+                defaultValue: 'user', // 默认角色为普通用户
             },
         },
         {
@@ -100,16 +100,30 @@ module.exports = (sequelize, DataTypes) => {
         });
         // 一个用户有多个项目（作为参与者）
         User.belongsToMany(models.Project, {
-            through: models.ProjectUser, // 关联表
+            through: {
+                model: models.ProjectUser,
+                unique: false,
+            },
             foreignKey: 'userId',
             otherKey: 'projectId',
-            as: 'projects',
+            as: 'joinedProjects',
         });
-        // 一个用户可以创建多个项目
+        // 获取用户管理的项目
+        User.belongsToMany(models.Project, {
+            through: {
+                model: models.ProjectUser,
+                scope: {
+                    role: 'manager',
+                },
+            },
+            foreignKey: 'userId',
+            otherKey: 'projectId',
+            as: 'managedProjects',
+        });
+        // 获取用户创建的项目
         User.hasMany(models.Project, {
             foreignKey: 'creatorId',
             as: 'createdProjects',
-            onDelete: 'SET NULL',
         });
     };
     return User;

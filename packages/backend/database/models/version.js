@@ -8,25 +8,22 @@ module.exports = (sequelize, DataTypes) => {
          * 关联模型
          */
         static associate(models) {
-            // 一个版本属于一个项目
+            // 版本属于一个项目
             Version.belongsTo(models.Project, {
                 foreignKey: 'projectId',
                 as: 'project',
-                onDelete: 'CASCADE',
             });
 
-            // 一个版本有多个需求
+            // 版本有多个需求
             Version.hasMany(models.Requirement, {
                 foreignKey: 'versionId',
                 as: 'requirements',
-                onDelete: 'CASCADE',
             });
 
-            // 一个版本有多个缺陷
+            // 版本有多个缺陷
             Version.hasMany(models.Defect, {
                 foreignKey: 'versionId',
                 as: 'defects',
-                onDelete: 'CASCADE',
             });
         }
     }

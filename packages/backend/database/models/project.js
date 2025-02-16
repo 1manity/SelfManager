@@ -17,17 +17,32 @@ module.exports = (sequelize, DataTypes) => {
 
             // 一个项目有多个用户（多对多关系）
             Project.belongsToMany(models.User, {
-                through: models.ProjectUser, // 关联表
+                through: {
+                    model: models.ProjectUser,
+                    unique: false,
+                },
                 foreignKey: 'projectId',
                 otherKey: 'userId',
-                as: 'users',
+                as: 'members',
             });
 
-            // 一个项目有一个创建者
+            // 获取项目管理者的关联
+            Project.belongsToMany(models.User, {
+                through: {
+                    model: models.ProjectUser,
+                    scope: {
+                        role: 'manager',
+                    },
+                },
+                foreignKey: 'projectId',
+                otherKey: 'userId',
+                as: 'managers',
+            });
+
+            // 创建者关联
             Project.belongsTo(models.User, {
                 foreignKey: 'creatorId',
                 as: 'creator',
-                onDelete: 'SET NULL', // 如果创建者被删除，设置为 NULL
             });
         }
     }
@@ -55,14 +70,13 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: 'planning',
             },
             creatorId: {
-                // 项目创建者
                 type: DataTypes.INTEGER,
-                allowNull: true, // 如果创建者被删除，可以为空
+                allowNull: false, // 改为不允许为空，项目必须有创建者
                 references: {
                     model: 'Users',
                     key: 'id',
                 },
-                onDelete: 'SET NULL',
+                onDelete: 'CASCADE', // 如果创建者被删除，项目也会被删除
             },
         },
         {
