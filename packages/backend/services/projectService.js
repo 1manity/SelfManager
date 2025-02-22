@@ -85,12 +85,14 @@ const ProjectService = {
 
         // 如果指定了userId，只返回该用户参与的项目
         if (userId) {
-            options.include.push({
-                model: ProjectUser,
-                where: { userId },
-                attributes: [],
-                required: true,
-            });
+            options.where = {
+                [Op.or]: [
+                    { creatorId: userId },
+                    {
+                        '$members.id$': userId,
+                    },
+                ],
+            };
         }
 
         return await Project.findAll(options);
