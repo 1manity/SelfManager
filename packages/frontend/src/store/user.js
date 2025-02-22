@@ -11,6 +11,7 @@ export const userSlice = createSlice({
             bio: '',
             createdAt: '',
             updatedAt: '',
+            role: '',
         },
     },
     reducers: {
