@@ -86,6 +86,10 @@ const ProjectDetail = () => {
         }
     };
 
+    const handleBack = () => {
+        navigate('/projects'); // 直接导航到项目列表页面
+    };
+
     const menuItems = [
         { id: 'info', icon: IconInfoCircle, label: '项目信息' },
         { id: 'versions', icon: IconPlus, label: '版本管理' },
@@ -102,7 +106,7 @@ const ProjectDetail = () => {
             {/* 左侧导航栏 */}
             <div className="w-64 p-6 border-r">
                 <div className="flex items-center space-x-2 mb-8">
-                    <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+                    <Button variant="ghost" size="icon" onClick={handleBack}>
                         <IconArrowLeft className="h-4 w-4" />
                     </Button>
                     <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">{project?.name}</h1>
@@ -146,8 +150,8 @@ const ProjectDetail = () => {
                                     <div>
                                         <h3 className="font-medium mb-2">项目成员</h3>
                                         <div className="space-y-2 text-sm text-gray-500">
-                                            <p>创建者：{project?.creator.nickname}</p>
-                                            <p>成员数：{project?.users.length} 人</p>
+                                            <p>创建者：{project?.creator.username}</p>
+                                            <p>成员数：{project?.members.length} 人</p>
                                         </div>
                                     </div>
                                 </div>
@@ -209,35 +213,37 @@ const ProjectDetail = () => {
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-3">
                                         <img
-                                            src={project.creator.avatar}
-                                            alt={project.creator.nickname}
+                                            src={project?.creator.avatar}
+                                            alt={project?.creator.username}
                                             className="w-8 h-8 rounded-full object-cover"
                                         />
                                         <div>
-                                            <div className="font-medium">{project.creator.nickname}</div>
-                                            <div className="text-sm text-gray-500">{project.creator.username}</div>
+                                            <div className="font-medium">{project?.creator.username}</div>
+                                            <div className="text-sm text-gray-500">{project?.creator.username}</div>
                                         </div>
                                     </div>
                                     <div className="text-sm font-medium text-primary">创建者</div>
                                 </div>
 
                                 {/* 其他成员 */}
-                                {project.users.map(
-                                    (user) =>
-                                        user.id !== project.creator.id && (
-                                            <div key={user.id} className="flex items-center justify-between">
+                                {project?.members.map(
+                                    (member) =>
+                                        member.id !== project.creator.id && (
+                                            <div key={member.id} className="flex items-center justify-between">
                                                 <div className="flex items-center space-x-3">
                                                     <img
-                                                        src={user.avatar}
-                                                        alt={user.nickname}
+                                                        src={member.avatar}
+                                                        alt={member.username}
                                                         className="w-8 h-8 rounded-full object-cover"
                                                     />
                                                     <div>
-                                                        <div className="font-medium">{user.nickname}</div>
-                                                        <div className="text-sm text-gray-500">{user.username}</div>
+                                                        <div className="font-medium">{member.username}</div>
+                                                        <div className="text-sm text-gray-500">{member.username}</div>
                                                     </div>
                                                 </div>
-                                                <div className="text-sm text-gray-500">成员</div>
+                                                <div className="text-sm text-gray-500">
+                                                    {member.ProjectUser.role === 'manager' ? '管理者' : '成员'}
+                                                </div>
                                             </div>
                                         )
                                 )}

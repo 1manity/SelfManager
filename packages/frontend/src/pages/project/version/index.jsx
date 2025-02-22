@@ -244,6 +244,10 @@ const VersionDetail = () => {
         }
     };
 
+    const handleBack = () => {
+        navigate(`/project/detail/${projectId}`); // 返回到对应的项目详情页
+    };
+
     const menuItems = [
         { id: 'info', icon: IconInfoCircle, label: '版本信息' },
         { id: 'requirements', icon: IconListCheck, label: '需求列表' },
@@ -315,13 +319,10 @@ const VersionDetail = () => {
             {/* 左侧导航栏 */}
             <div className="w-64 p-6 border-r">
                 <div className="flex items-center space-x-2 mb-8">
-                    <Button variant="ghost" size="icon" onClick={() => navigate(`/project/detail/${projectId}`)}>
+                    <Button variant="ghost" size="icon" onClick={handleBack}>
                         <IconArrowLeft className="h-4 w-4" />
                     </Button>
-                    <div>
-                        <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">{version.versionNumber}</h1>
-                        <p className="text-sm text-gray-500">版本详情</p>
-                    </div>
+                    <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">{version?.versionNumber}</h1>
                 </div>
 
                 <nav className="space-y-2">
