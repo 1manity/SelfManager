@@ -81,38 +81,6 @@ export const deleteProject = async (projectId) => {
 };
 
 /**
- * 添加用户到项目（仅管理员可操作）
- * @param {number} projectId - 项目ID
- * @param {number} userId - 用户ID
- * @returns {Promise} - 返回操作结果消息
- */
-export const addUserToProject = async (projectId, userId) => {
-    try {
-        const response = await request.post(`/projects/${projectId}/add-user`, { userId });
-        return response;
-    } catch (error) {
-        console.error('添加用户到项目失败:', error.message);
-        return error;
-    }
-};
-
-/**
- * 从项目中移除用户（仅管理员可操作）
- * @param {number} projectId - 项目ID
- * @param {number} userId - 用户ID
- * @returns {Promise} - 返回操作结果消息
- */
-export const removeUserFromProject = async (projectId, userId) => {
-    try {
-        const response = await request.post(`/projects/${projectId}/remove-user`, { userId });
-        return response;
-    } catch (error) {
-        console.error('从项目中移除用户失败:', error.message);
-        return error;
-    }
-};
-
-/**
  * 获取项目的所有用户
  * @param {number} projectId - 项目ID
  * @returns {Promise} - 返回项目的所有用户及创建者信息
@@ -124,5 +92,38 @@ export const getProjectUsers = async (projectId) => {
     } catch (error) {
         console.error('获取项目用户失败:', error.message);
         return error;
+    }
+};
+
+// 添加项目成员
+export const addProjectMember = async (projectId, userId, role) => {
+    try {
+        const response = await request.post(`/projects/${projectId}/users`, { userId, role });
+        return response;
+    } catch (error) {
+        console.error('添加项目成员失败:', error.message);
+        throw error;
+    }
+};
+
+// 移除项目成员
+export const removeProjectMember = async (projectId, userId) => {
+    try {
+        const response = await request.delete(`/projects/${projectId}/users/${userId}`);
+        return response;
+    } catch (error) {
+        console.error('移除项目成员失败:', error.message);
+        throw error;
+    }
+};
+
+// 更新项目成员角色
+export const updateMemberRole = async (projectId, userId, role) => {
+    try {
+        const response = await request.put(`/projects/${projectId}/users/${userId}/role`, { role });
+        return response;
+    } catch (error) {
+        console.error('更新成员角色失败:', error.message);
+        throw error;
     }
 };

@@ -1,17 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getProjectById } from '@/api/project';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { IconArrowLeft, IconUsers, IconPlus, IconInfoCircle, IconSettings } from '@tabler/icons-react';
 import { format } from 'date-fns';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { createVersion } from '@/api/version';
 import { useToast } from '@/hooks/use-toast';
+import { getAllUsers } from '@/api/user/admin';
+import { addProjectMember, removeProjectMember, updateMemberRole } from '@/api/project';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useSelector } from 'react-redux';
 
 const ProjectDetail = () => {
     const { id } = useParams();
@@ -28,8 +49,45 @@ const ProjectDetail = () => {
         releaseDate: '',
         status: 'planned',
     });
+    const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+    const [isRemoveMemberOpen, setIsRemoveMemberOpen] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState(null);
+    const [selectedRole, setSelectedRole] = useState('member');
+    const [availableUsers, setAvailableUsers] = useState([]);
+    const [removingUserId, setRemovingUserId] = useState(null);
+    const currentUser = useSelector((state) => state.user.user);
 
     const { toast } = useToast();
+
+    // 检查用户权限
+    const canManageMembers = useMemo(() => {
+        if (!project || !currentUser) return false;
+        return (
+            currentUser.role === 'super_admin' ||
+            currentUser.role === 'admin' ||
+            project.creator.id === currentUser.id ||
+            project.members.find((m) => m.id === currentUser.id)?.ProjectUser?.role === 'manager'
+        );
+    }, [project, currentUser]);
+
+    // 获取可添加的用户列表
+    useEffect(() => {
+        if (isAddMemberOpen && canManageMembers) {
+            const fetchAvailableUsers = async () => {
+                try {
+                    const response = await getAllUsers();
+                    if (response.code === 200) {
+                        // 过滤掉已经在项目中的用户
+                        const existingUserIds = project.members.map((m) => m.id);
+                        setAvailableUsers(response.data.filter((user) => !existingUserIds.includes(user.id)));
+                    }
+                } catch (error) {
+                    console.error('获取用户列表失败:', error);
+                }
+            };
+            fetchAvailableUsers();
+        }
+    }, [isAddMemberOpen, project, canManageMembers]);
 
     useEffect(() => {
         const fetchProjectData = async () => {
@@ -88,6 +146,68 @@ const ProjectDetail = () => {
 
     const handleBack = () => {
         navigate('/projects'); // 直接导航到项目列表页面
+    };
+
+    const handleAddMember = async () => {
+        if (!selectedUserId || !selectedRole) return;
+
+        try {
+            const response = await addProjectMember(project.id, selectedUserId, selectedRole);
+            if (response.code === 200) {
+                // 更新项目成员列表
+                const newMember = availableUsers.find((u) => u.id === selectedUserId);
+                setProject({
+                    ...project,
+                    members: [...project.members, { ...newMember, ProjectUser: { role: selectedRole } }],
+                });
+                setIsAddMemberOpen(false);
+                setSelectedUserId(null);
+                setSelectedRole('member');
+            } else {
+                console.error('添加成员失败:', response.message);
+            }
+        } catch (error) {
+            console.error('添加成员失败:', error);
+        }
+    };
+
+    const handleRemoveMember = async () => {
+        if (!removingUserId) return;
+
+        try {
+            const response = await removeProjectMember(project.id, removingUserId);
+            if (response.code === 200) {
+                setProject({
+                    ...project,
+                    members: project.members.filter((m) => m.id !== removingUserId),
+                });
+            } else {
+                console.error('移除成员失败:', response.message);
+            }
+        } catch (error) {
+            console.error('移除成员失败:', error);
+        } finally {
+            setIsRemoveMemberOpen(false);
+            setRemovingUserId(null);
+        }
+    };
+
+    const handleRoleChange = async (userId, newRole) => {
+        try {
+            const response = await updateMemberRole(project.id, userId, newRole);
+            if (response.code === 200) {
+                setProject({
+                    ...project,
+                    members: project.members.map((m) =>
+                        m.id === userId ? { ...m, ProjectUser: { ...m.ProjectUser, role: newRole } } : m
+                    ),
+                });
+            } else {
+                console.error('更新角色失败:', response.message);
+            }
+        } catch (error) {
+            console.error('更新角色失败:', error);
+        }
     };
 
     const menuItems = [
@@ -205,7 +325,15 @@ const ProjectDetail = () => {
                 {activeSection === 'members' && (
                     <Card>
                         <CardHeader>
-                            <CardTitle>项目成员</CardTitle>
+                            <div className="flex justify-between items-center">
+                                <CardTitle>项目成员</CardTitle>
+                                {canManageMembers && (
+                                    <Button onClick={() => setIsAddMemberOpen(true)}>
+                                        <IconPlus className="h-4 w-4 mr-2" />
+                                        添加成员
+                                    </Button>
+                                )}
+                            </div>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
@@ -219,7 +347,9 @@ const ProjectDetail = () => {
                                         />
                                         <div>
                                             <div className="font-medium">{project?.creator.username}</div>
-                                            <div className="text-sm text-gray-500">{project?.creator.username}</div>
+                                            <div className="text-sm text-gray-500">
+                                                {project?.creator.nickname || project?.creator.username}
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="text-sm font-medium text-primary">创建者</div>
@@ -238,11 +368,45 @@ const ProjectDetail = () => {
                                                     />
                                                     <div>
                                                         <div className="font-medium">{member.username}</div>
-                                                        <div className="text-sm text-gray-500">{member.username}</div>
+                                                        <div className="text-sm text-gray-500">
+                                                            {member.nickname || member.username}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="text-sm text-gray-500">
-                                                    {member.ProjectUser.role === 'manager' ? '管理者' : '成员'}
+                                                <div className="flex items-center gap-2">
+                                                    {canManageMembers && (
+                                                        <>
+                                                            <Select
+                                                                value={member.ProjectUser.role}
+                                                                onValueChange={(value) =>
+                                                                    handleRoleChange(member.id, value)
+                                                                }
+                                                            >
+                                                                <SelectTrigger className="w-[120px]">
+                                                                    <SelectValue />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="manager">管理者</SelectItem>
+                                                                    <SelectItem value="member">成员</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <Button
+                                                                variant="destructive"
+                                                                size="sm"
+                                                                onClick={() => {
+                                                                    setRemovingUserId(member.id);
+                                                                    setIsRemoveMemberOpen(true);
+                                                                }}
+                                                            >
+                                                                移除
+                                                            </Button>
+                                                        </>
+                                                    )}
+                                                    {!canManageMembers && (
+                                                        <div className="text-sm text-gray-500">
+                                                            {member.ProjectUser.role === 'manager' ? '管理者' : '成员'}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         )
@@ -304,6 +468,64 @@ const ProjectDetail = () => {
                     </form>
                 </DialogContent>
             </Dialog>
+
+            {/* 添加成员对话框 */}
+            <Dialog open={isAddMemberOpen} onOpenChange={setIsAddMemberOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>添加项目成员</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <label>选择用户</label>
+                            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="选择用户" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {availableUsers.map((user) => (
+                                        <SelectItem key={user.id} value={user.id}>
+                                            {user.username}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <label>选择角色</label>
+                            <Select value={selectedRole} onValueChange={setSelectedRole}>
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="manager">管理者</SelectItem>
+                                    <SelectItem value="member">成员</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsAddMemberOpen(false)}>
+                            取消
+                        </Button>
+                        <Button onClick={handleAddMember}>添加</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* 移除成员确认对话框 */}
+            <AlertDialog open={isRemoveMemberOpen} onOpenChange={setIsRemoveMemberOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>确认移除</AlertDialogTitle>
+                        <AlertDialogDescription>确定要移除该成员吗？此操作无法撤销。</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleRemoveMember}>确认移除</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };

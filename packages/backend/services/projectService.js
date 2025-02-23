@@ -175,9 +175,18 @@ const ProjectService = {
 
     // 从项目中移除用户
     async removeUserFromProject(projectId, userId, operatorId) {
-        // 检查操作者权限
-        const isManager = await this.isProjectManager(projectId, operatorId);
-        if (!isManager) {
+        // 检查操作者权限（项目管理者或创建者）
+        const isManagerOrCreator = await ProjectUser.findOne({
+            where: {
+                projectId,
+                userId: operatorId,
+                role: {
+                    [Op.in]: ['creator', 'manager'],
+                },
+            },
+        });
+
+        if (!isManagerOrCreator) {
             throw new Error('没有权限移除项目成员');
         }
 
@@ -189,16 +198,17 @@ const ProjectService = {
             },
         });
 
+        if (!targetUser) {
+            throw new Error('用户不是项目成员');
+        }
+
         if (targetUser.role === 'creator') {
             throw new Error('不能移除项目创建者');
         }
 
-        // 如果要移除的是管理者，需要检查操作者是否为创建者
-        if (targetUser.role === 'manager') {
-            const isCreator = await this.isProjectCreator(projectId, operatorId);
-            if (!isCreator) {
-                throw new Error('只有项目创建者可以移除项目管理者');
-            }
+        // 如果操作者是管理者（不是创建者），则不能移除其他管理者
+        if (isManagerOrCreator.role === 'manager' && targetUser.role === 'manager') {
+            throw new Error('项目管理者不能移除其他管理者');
         }
 
         await targetUser.destroy();
@@ -207,10 +217,19 @@ const ProjectService = {
 
     // 更新项目成员角色
     async updateProjectUserRole(projectId, userId, newRole, operatorId) {
-        // 只有创建者可以更改角色
-        const isCreator = await this.isProjectCreator(projectId, operatorId);
-        if (!isCreator) {
-            throw new Error('只有项目创建者可以更改成员角色');
+        // 检查操作者权限（项目管理者或创建者）
+        const isManagerOrCreator = await ProjectUser.findOne({
+            where: {
+                projectId,
+                userId: operatorId,
+                role: {
+                    [Op.in]: ['creator', 'manager'],
+                },
+            },
+        });
+
+        if (!isManagerOrCreator) {
+            throw new Error('没有权限更改成员角色');
         }
 
         const projectUser = await ProjectUser.findOne({
@@ -226,6 +245,11 @@ const ProjectService = {
 
         if (projectUser.role === 'creator') {
             throw new Error('不能更改创建者的角色');
+        }
+
+        // 如果操作者是管理者（不是创建者），则不能修改其他管理者的角色
+        if (isManagerOrCreator.role === 'manager' && projectUser.role === 'manager') {
+            throw new Error('项目管理者不能修改其他管理者的角色');
         }
 
         await projectUser.update({ role: newRole });
