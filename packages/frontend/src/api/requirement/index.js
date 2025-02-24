@@ -1,15 +1,14 @@
 import request from '@/api/request';
 
 /**
- * 创建新需求
- * @param {Object} requirementData - 需求数据
- * @param {number} requirementData.versionId - 关联的版本ID
- * @param {string} requirementData.title - 需求标题
- * @param {string} [requirementData.description] - 需求描述
- * @param {string} [requirementData.priority] - 优先级（high, medium, low）
- * @param {string} [requirementData.status] - 状态（pending, in_progress, completed）
- * @param {string} [requirementData.dueDate] - 截止日期
- * @returns {Promise} - 返回创建的需求数据
+ * 创建需求
+ * @param {Object} requirementData
+ * @param {number} requirementData.versionId - 版本ID
+ * @param {string} requirementData.title - 标题
+ * @param {string} requirementData.description - 描述
+ * @param {string} requirementData.priority - 优先级 ('low'|'medium'|'high')
+ * @param {string} requirementData.dueDate - 截止日期
+ * @param {number} [requirementData.assigneeId] - 指派人ID
  */
 export const createRequirement = async (requirementData) => {
     try {
@@ -17,51 +16,21 @@ export const createRequirement = async (requirementData) => {
         return response;
     } catch (error) {
         console.error('创建需求失败:', error.message);
-        return error;
+        throw error;
     }
 };
 
 /**
- * 获取所有需求（仅管理员可访问）
- * @returns {Promise} - 返回需求列表
- */
-export const getAllRequirements = async () => {
-    try {
-        const response = await request.get('/requirements');
-        return response;
-    } catch (error) {
-        console.error('获取需求列表失败:', error.message);
-        return error;
-    }
-};
-
-/**
- * 获取单个需求详情
- * @param {number} requirementId - 需求ID
- * @returns {Promise} - 返回需求详情
- */
-export const getRequirementById = async (requirementId) => {
-    try {
-        const response = await request.get(`/requirements/${requirementId}`);
-        return response;
-    } catch (error) {
-        console.error('获取需求失败:', error.message);
-        return error;
-    }
-};
-
-/**
- * 获取指定版本的所有需求
+ * 获取版本的所有需求
  * @param {number} versionId - 版本ID
- * @returns {Promise} - 返回版本的所有需求
  */
 export const getRequirementsByVersionId = async (versionId) => {
     try {
-        const response = await request.get(`/requirements/version/${versionId}`);
+        const response = await request.get(`/versions/${versionId}/requirements`);
         return response;
     } catch (error) {
-        console.error('获取版本需求失败:', error.message);
-        return error;
+        console.error('获取需求列表失败:', error.message);
+        throw error;
     }
 };
 
@@ -69,7 +38,6 @@ export const getRequirementsByVersionId = async (versionId) => {
  * 更新需求
  * @param {number} requirementId - 需求ID
  * @param {Object} updates - 更新数据
- * @returns {Promise} - 返回更新后的需求数据
  */
 export const updateRequirement = async (requirementId, updates) => {
     try {
@@ -77,14 +45,13 @@ export const updateRequirement = async (requirementId, updates) => {
         return response;
     } catch (error) {
         console.error('更新需求失败:', error.message);
-        return error;
+        throw error;
     }
 };
 
 /**
- * 删除需求（仅管理员可操作）
+ * 删除需求
  * @param {number} requirementId - 需求ID
- * @returns {Promise} - 返回删除成功的消息
  */
 export const deleteRequirement = async (requirementId) => {
     try {
@@ -92,6 +59,51 @@ export const deleteRequirement = async (requirementId) => {
         return response;
     } catch (error) {
         console.error('删除需求失败:', error.message);
-        return error;
+        throw error;
+    }
+};
+
+/**
+ * 指派需求
+ * @param {number} requirementId - 需求ID
+ * @param {number} assigneeId - 指派人ID
+ */
+export const assignRequirement = async (requirementId, assigneeId) => {
+    try {
+        const response = await request.put(`/requirements/${requirementId}/assign`, { assigneeId });
+        return response;
+    } catch (error) {
+        console.error('指派需求失败:', error.message);
+        throw error;
+    }
+};
+
+/**
+ * 更新需求状态
+ * @param {number} requirementId - 需求ID
+ * @param {string} status - 新状态
+ */
+export const updateRequirementStatus = async (requirementId, status) => {
+    try {
+        const response = await request.put(`/requirements/${requirementId}/status`, { status });
+        return response;
+    } catch (error) {
+        console.error('更新需求状态失败:', error.message);
+        throw error;
+    }
+};
+
+/**
+ * 更新需求进度
+ * @param {number} requirementId - 需求ID
+ * @param {number} progress - 进度 (0-100)
+ */
+export const updateRequirementProgress = async (requirementId, progress) => {
+    try {
+        const response = await request.put(`/requirements/${requirementId}/progress`, { progress });
+        return response;
+    } catch (error) {
+        console.error('更新需求进度失败:', error.message);
+        throw error;
     }
 };

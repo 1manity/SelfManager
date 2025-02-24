@@ -1,8 +1,41 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# 需求(Requirement)模型：
+## 基本信息：
+title: 标题
+description: 描述
+priority: 优先级(high/medium/low)
+status: 状态
+dueDate: 截止日期
+## 负责人相关：
+assigneeId: 负责人ID
+assignedAt: 分配时间
+## 进度相关：
+progress: 完成进度(0-100)
+startedAt: 开始时间
+completedAt: 完成时间
+## 评论功能：允许团队成员讨论
+# 缺陷(Defect)模型：
+## 基本信息：
+title: 标题
+description: 描述
+severity: 严重程度(high/medium/low)
+status: 状态
+## 负责人相关：
+assigneeId: 负责人ID
+assignedAt: 分配时间
+## 技术细节：
+stepsToReproduce: 复现步骤
+expectedResult: 期望结果
+solution: 解决方案
+## 评论功能：允许团队成员讨论
+# 状态流转：
+## 需求状态：
+待处理(pending) -> 进行中(in_progress) -> 开发完成(developed) -> 测试中(testing) -> 已完成(completed)
+## 缺陷状态：
+待处理(open) -> 修复中(in_progress) -> 待验证(to_verify) -> 已修复(resolved) -> 已关闭(closed)
+# 评论系统设计：
+commentId: 评论ID
+content: 评论内容
+userId: 评论者ID
+targetType: 评论目标类型(requirement/defect)
+targetId: 目标ID
+createdAt: 创建时间

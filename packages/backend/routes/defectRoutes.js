@@ -87,22 +87,6 @@ router.get('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-/**
- * 获取指定版本的所有缺陷（需要是项目成员）
- * @route GET /api/defects/version/:versionId
- * @param {number} versionId - 版本ID
- * @returns {object[]} 缺陷列表
- */
-router.get('/version/:versionId', authMiddleware, async (req, res) => {
-    const { versionId } = req.params;
-    const userId = req.user.id;
-    try {
-        const defects = await DefectService.getDefectsByVersionId(versionId, userId);
-        res.json(ApiResponse.success('获取版本缺陷成功', defects));
-    } catch (error) {
-        res.json(ApiResponse.error(error.message));
-    }
-});
 
 /**
  * 更新缺陷（需要是项目管理者）

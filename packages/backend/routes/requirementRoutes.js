@@ -73,22 +73,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-/**
- * 获取指定版本的所有需求（需要是项目成员）
- * @route GET /api/requirements/version/:versionId
- * @param {number} versionId - 版本ID
- * @returns {object[]} 需求列表
- */
-router.get('/version/:versionId', authMiddleware, async (req, res) => {
-    const { versionId } = req.params;
-    const userId = req.user.id;
-    try {
-        const requirements = await RequirementService.getRequirementsByVersionId(versionId, userId);
-        res.json(ApiResponse.success('获取版本需求成功', requirements));
-    } catch (error) {
-        res.json(ApiResponse.error(error.message));
-    }
-});
+
 
 /**
  * 更新需求（需要是项目管理者）
