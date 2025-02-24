@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getProjectById } from '@/api/project';
+import { getProjectById, addProjectMember, removeProjectMember, updateMemberRole } from '@/api/project';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { IconArrowLeft, IconUsers, IconPlus, IconInfoCircle, IconSettings } from '@tabler/icons-react';
@@ -20,7 +20,6 @@ import { cn } from '@/lib/utils';
 import { createVersion } from '@/api/version';
 import { useToast } from '@/hooks/use-toast';
 import { getAllUsers } from '@/api/user/admin';
-import { addProjectMember, removeProjectMember, updateMemberRole } from '@/api/project';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
     AlertDialog,

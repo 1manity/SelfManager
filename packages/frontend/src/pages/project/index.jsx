@@ -1,15 +1,7 @@
 // src/pages/ProjectPage.js
 
 import React, { useState, useEffect } from 'react';
-import {
-    getAllProjects,
-    createProject,
-    updateProject,
-    deleteProject,
-    addUserToProject,
-    removeUserFromProject,
-    getProjectUsers,
-} from '@/api/project';
+import { getAllProjects, createProject, updateProject, deleteProject } from '@/api/project';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -155,60 +147,6 @@ const ProjectPage = () => {
             if (response.code === 200) {
                 // 从项目列表中移除删除的项目
                 setProjects(projects.filter((project) => project.id !== projectId));
-            } else {
-                setError(response.message); // 设置错误信息
-            }
-        } catch (err) {
-            setError(err.message); // 捕获异常并设置错误信息
-        }
-    };
-
-    /**
-     * 添加用户到项目
-     * @param {number} projectId - 项目ID
-     * @param {number} userId - 用户ID
-     */
-    const handleAddUserToProject = async (projectId, userId) => {
-        try {
-            const response = await addUserToProject(projectId, userId);
-            if (response.code === 200) {
-                // 可选：刷新项目用户列表或更新状态
-            } else {
-                setError(response.message); // 设置错误信息
-            }
-        } catch (err) {
-            setError(err.message); // 捕获异常并设置错误信息
-        }
-    };
-
-    /**
-     * 从项目中移除用户
-     * @param {number} projectId - 项目ID
-     * @param {number} userId - 用户ID
-     */
-    const handleRemoveUserFromProject = async (projectId, userId) => {
-        try {
-            const response = await removeUserFromProject(projectId, userId);
-            if (response.code === 200) {
-                // 可选：刷新项目用户列表或更新状态
-            } else {
-                setError(response.message); // 设置错误信息
-            }
-        } catch (err) {
-            setError(err.message); // 捕获异常并设置错误信息
-        }
-    };
-
-    /**
-     * 获取项目的所有用户
-     * @param {number} projectId - 项目ID
-     */
-    const fetchProjectUsers = async (projectId) => {
-        try {
-            const response = await getProjectUsers(projectId);
-            if (response.code === 200) {
-                // 处理获取到的用户数据
-                // 例如，将用户数据存储在状态中以便渲染
             } else {
                 setError(response.message); // 设置错误信息
             }
