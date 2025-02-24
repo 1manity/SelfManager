@@ -57,6 +57,7 @@ const VersionService = {
                 {
                     model: Project,
                     as: 'project',
+                    required: true,
                     include: [
                         {
                             model: User,
@@ -66,7 +67,6 @@ const VersionService = {
                         {
                             model: User,
                             as: 'members',
-                            attributes: ['id', 'username', 'avatar'],
                             through: {
                                 attributes: ['role'],
                             },
@@ -76,10 +76,12 @@ const VersionService = {
                 {
                     model: Requirement,
                     as: 'requirements',
+                    separate: true,
                 },
                 {
                     model: Defect,
                     as: 'defects',
+                    separate: true,
                 },
             ],
         };
@@ -88,8 +90,8 @@ const VersionService = {
         if (userId) {
             options.include[0].include.push({
                 model: ProjectUser,
+                as: 'members',
                 where: { userId },
-                attributes: [],
                 required: true,
             });
         }

@@ -14,13 +14,14 @@ const ApiResponse = require('../utils/ApiResponse');
  * @body {string} body.title - 需求标题
  * @body {string} [body.description] - 需求描述
  * @body {string} body.priority - 优先级 ('high'|'medium'|'low')
- * @body {string} body.status - 状态 ('pending'|'in_progress'|'completed')
+ * @body {string} body.status - 状态 ('pending'|'in_progress'|'developed'|'testing'|'completed')
  * @body {Date} [body.dueDate] - 截止日期
+ * @body {number} [body.assigneeId] - 负责人ID
  * @returns {object} 创建的需求信息
  */
 router.post('/', authMiddleware, async (req, res) => {
     try {
-        const { versionId, title, description, priority, status, dueDate } = req.body;
+        const { versionId, title, description, priority, status, dueDate, assigneeId } = req.body;
         const userId = req.user.id;
         const requirement = await RequirementService.createRequirement(
             {
@@ -30,6 +31,7 @@ router.post('/', authMiddleware, async (req, res) => {
                 priority,
                 status,
                 dueDate,
+                assigneeId,
             },
             userId
         );
@@ -96,8 +98,10 @@ router.get('/version/:versionId', authMiddleware, async (req, res) => {
  * @body {string} [updates.title] - 需求标题
  * @body {string} [updates.description] - 需求描述
  * @body {string} [updates.priority] - 优先级 ('high'|'medium'|'low')
- * @body {string} [updates.status] - 状态 ('pending'|'in_progress'|'completed')
+ * @body {string} [updates.status] - 状态 ('pending'|'in_progress'|'developed'|'testing'|'completed')
  * @body {Date} [updates.dueDate] - 截止日期
+ * @body {number} [updates.assigneeId] - 负责人ID
+ * @body {number} [updates.progress] - 完成进度(0-100)
  * @returns {object} 更新后的需求信息
  */
 router.put('/:id', authMiddleware, async (req, res) => {
@@ -124,6 +128,43 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         await RequirementService.deleteRequirement(id, userId);
         res.json(ApiResponse.noContent('需求删除成功'));
+    } catch (error) {
+        res.json(ApiResponse.error(error.message));
+    }
+});
+
+/**
+ * 添加需求评论
+ * @route POST /api/requirements/:id/comments
+ * @param {number} id - 需求ID
+ * @body {object} body
+ * @body {string} body.content - 评论内容
+ * @returns {object} 创建的评论信息
+ */
+router.post('/:id/comments', authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    const { content } = req.body;
+    const userId = req.user.id;
+    try {
+        const comment = await RequirementService.addComment(id, userId, content);
+        res.json(ApiResponse.success('评论添加成功', comment));
+    } catch (error) {
+        res.json(ApiResponse.error(error.message));
+    }
+});
+
+/**
+ * 获取需求评论列表
+ * @route GET /api/requirements/:id/comments
+ * @param {number} id - 需求ID
+ * @returns {object[]} 评论列表
+ */
+router.get('/:id/comments', authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+    try {
+        const comments = await RequirementService.getComments(id, userId);
+        res.json(ApiResponse.success('获取评论列表成功', comments));
     } catch (error) {
         res.json(ApiResponse.error(error.message));
     }

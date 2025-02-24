@@ -1,4 +1,4 @@
-const { Defect, Version, Project, ProjectUser } = require('../database/models');
+const { Defect, Version, Project, ProjectUser, User, Comment } = require('../database/models');
 
 const DefectService = {
     // 检查用户是否有权限操作缺陷（项目成员才能操作）
@@ -25,43 +25,75 @@ const DefectService = {
     },
 
     // 创建缺陷
-    async createDefect({ versionId, title, description, stepsToReproduce, severity, status }, userId) {
+    async createDefect(
+        { versionId, title, description, stepsToReproduce, expectedResult, severity, status, assigneeId },
+        userId
+    ) {
         // 检查权限
         await this.checkPermission(versionId, userId);
 
-        const defect = await Defect.create({
+        // 构建创建参数
+        const createParams = {
             versionId,
             title,
             description,
             stepsToReproduce,
+            expectedResult,
             severity,
             status,
-        });
+        };
+
+        // 如果指定了负责人，先验证用户是否存在
+        if (assigneeId) {
+            const assignee = await User.findByPk(assigneeId);
+            if (!assignee) {
+                throw new Error('指定的负责人不存在');
+            }
+            createParams.assigneeId = assigneeId;
+            createParams.assignedAt = new Date();
+        }
+
+        const defect = await Defect.create(createParams);
         return defect;
     },
 
     // 获取所有缺陷（需要是项目成员）
     async getAllDefects(userId) {
+        // 先获取用户参与的所有项目ID
+        const projectUsers = await ProjectUser.findAll({
+            where: { userId },
+            attributes: ['projectId'],
+        });
+        const projectIds = projectUsers.map((pu) => pu.projectId);
+
+        // 获取这些项目下的所有版本ID
+        const versions = await Version.findAll({
+            where: {
+                projectId: projectIds,
+            },
+            attributes: ['id'],
+        });
+        const versionIds = versions.map((v) => v.id);
+
+        // 获取这些版本下的所有缺陷
         const defects = await Defect.findAll({
+            where: {
+                versionId: versionIds,
+            },
             include: [
                 {
                     model: Version,
                     as: 'version',
-                    include: [
-                        {
-                            model: Project,
-                            as: 'project',
-                            include: [
-                                {
-                                    model: ProjectUser,
-                                    where: { userId },
-                                },
-                            ],
-                        },
-                    ],
+                    attributes: ['id', 'versionNumber'],
+                },
+                {
+                    model: User,
+                    as: 'assignee',
+                    attributes: ['id', 'username', 'avatar'],
                 },
             ],
         });
+
         return defects;
     },
 
@@ -73,6 +105,22 @@ const DefectService = {
                     model: Version,
                     as: 'version',
                     attributes: ['id', 'versionNumber'],
+                },
+                {
+                    model: User,
+                    as: 'assignee',
+                    attributes: ['id', 'username', 'avatar'],
+                },
+                {
+                    model: Comment,
+                    as: 'comments',
+                    include: [
+                        {
+                            model: User,
+                            as: 'user',
+                            attributes: ['id', 'username', 'avatar'],
+                        },
+                    ],
                 },
             ],
         });
@@ -117,6 +165,17 @@ const DefectService = {
 
         if (!projectUser) throw new Error('只有项目管理者可以更新缺陷');
 
+        // 如果更新了负责人，先验证用户是否存在
+        if (updates.assigneeId) {
+            const assignee = await User.findByPk(updates.assigneeId);
+            if (!assignee) {
+                throw new Error('指定的负责人不存在');
+            }
+            if (updates.assigneeId !== defect.assigneeId) {
+                updates.assignedAt = new Date();
+            }
+        }
+
         await defect.update(updates);
         return defect;
     },
@@ -142,6 +201,50 @@ const DefectService = {
         if (!projectUser) throw new Error('只有项目管理者可以删除缺陷');
 
         await defect.destroy();
+    },
+
+    // 添加评论
+    async addComment(defectId, userId, content) {
+        const defect = await Defect.findByPk(defectId);
+        if (!defect) throw new Error('缺陷未找到');
+
+        // 检查权限
+        await this.checkPermission(defect.versionId, userId);
+
+        const comment = await Comment.create({
+            content,
+            userId,
+            targetType: 'defect',
+            targetId: defectId,
+        });
+
+        return comment;
+    },
+
+    // 获取评论列表
+    async getComments(defectId, userId) {
+        const defect = await Defect.findByPk(defectId);
+        if (!defect) throw new Error('缺陷未找到');
+
+        // 检查权限
+        await this.checkPermission(defect.versionId, userId);
+
+        const comments = await Comment.findAll({
+            where: {
+                targetType: 'defect',
+                targetId: defectId,
+            },
+            include: [
+                {
+                    model: User,
+                    as: 'user',
+                    attributes: ['id', 'username', 'avatar'],
+                },
+            ],
+            order: [['createdAt', 'DESC']],
+        });
+
+        return comments;
     },
 };
 

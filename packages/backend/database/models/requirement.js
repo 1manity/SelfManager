@@ -15,6 +15,22 @@ module.exports = (sequelize, DataTypes) => {
                 onDelete: 'CASCADE',
             });
 
+            // 需求关联到负责人
+            Requirement.belongsTo(models.User, {
+                foreignKey: 'assigneeId',
+                as: 'assignee',
+            });
+
+            // 需求有多个评论
+            Requirement.hasMany(models.Comment, {
+                foreignKey: 'targetId',
+                constraints: false,
+                scope: {
+                    targetType: 'requirement',
+                },
+                as: 'comments',
+            });
+
             // 通过版本间接关联项目
             // 如果需要访问项目，可以通过 Requirement 实例的 version 关联
         }
@@ -47,10 +63,38 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: 'medium',
             },
             status: {
-                type: DataTypes.ENUM('pending', 'in_progress', 'completed'),
+                type: DataTypes.ENUM('pending', 'in_progress', 'developed', 'testing', 'completed'),
                 defaultValue: 'pending',
             },
             dueDate: {
+                type: DataTypes.DATE,
+                allowNull: true,
+            },
+            assigneeId: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+                references: {
+                    model: 'Users',
+                    key: 'id',
+                },
+            },
+            assignedAt: {
+                type: DataTypes.DATE,
+                allowNull: true,
+            },
+            progress: {
+                type: DataTypes.INTEGER,
+                defaultValue: 0,
+                validate: {
+                    min: 0,
+                    max: 100,
+                },
+            },
+            startedAt: {
+                type: DataTypes.DATE,
+                allowNull: true,
+            },
+            completedAt: {
                 type: DataTypes.DATE,
                 allowNull: true,
             },

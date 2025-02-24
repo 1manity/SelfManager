@@ -17,6 +17,22 @@ module.exports = (sequelize, DataTypes) => {
 
             // 通过版本间接关联项目
             // 如果需要访问项目，可以通过 Defect 实例的 version 关联
+
+            // 缺陷关联到负责人
+            Defect.belongsTo(models.User, {
+                foreignKey: 'assigneeId',
+                as: 'assignee',
+            });
+
+            // 缺陷有多个评论
+            Defect.hasMany(models.Comment, {
+                foreignKey: 'targetId',
+                constraints: false,
+                scope: {
+                    targetType: 'defect',
+                },
+                as: 'comments',
+            });
         }
     }
 
@@ -46,13 +62,33 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
+            expectedResult: {
+                type: DataTypes.TEXT,
+                allowNull: true,
+            },
+            solution: {
+                type: DataTypes.TEXT,
+                allowNull: true,
+            },
             severity: {
                 type: DataTypes.ENUM('high', 'medium', 'low'),
                 defaultValue: 'medium',
             },
             status: {
-                type: DataTypes.ENUM('open', 'in_progress', 'resolved', 'closed'),
+                type: DataTypes.ENUM('open', 'in_progress', 'to_verify', 'resolved', 'closed'),
                 defaultValue: 'open',
+            },
+            assigneeId: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+                references: {
+                    model: 'Users',
+                    key: 'id',
+                },
+            },
+            assignedAt: {
+                type: DataTypes.DATE,
+                allowNull: true,
             },
         },
         {
