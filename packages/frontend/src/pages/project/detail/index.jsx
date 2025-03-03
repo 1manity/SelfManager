@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getProjectById, addProjectMember, removeProjectMember, updateMemberRole } from '@/api/project';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { IconArrowLeft, IconUsers, IconPlus, IconInfoCircle, IconSettings } from '@tabler/icons-react';
+import { IconArrowLeft, IconUsers, IconPlus, IconInfoCircle, IconSettings, IconGitBranch } from '@tabler/icons-react';
 import { format } from 'date-fns';
 import {
     Dialog,
@@ -32,6 +32,8 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useSelector } from 'react-redux';
+import ProjectSettings from '../ProjectSettings/index.jsx';
+import { updateProject, deleteProject } from '@/api/project';
 
 const ProjectDetail = () => {
     const { id } = useParams();
@@ -209,12 +211,60 @@ const ProjectDetail = () => {
         }
     };
 
-    const menuItems = [
-        { id: 'info', icon: IconInfoCircle, label: '项目信息' },
-        { id: 'versions', icon: IconPlus, label: '版本管理' },
-        { id: 'members', icon: IconUsers, label: '成员管理' },
-        { id: 'settings', icon: IconSettings, label: '项目设置' },
-    ];
+    // 添加项目设置相关的处理函数
+    const handleUpdateProject = async (updates) => {
+        try {
+            const response = await updateProject(project.id, updates);
+            if (response.code === 200) {
+                setProject(response.data);
+                toast({
+                    title: '项目更新成功',
+                });
+            }
+        } catch (error) {
+            toast({
+                title: '项目更新失败',
+                description: error.message,
+                variant: 'destructive',
+            });
+        }
+    };
+
+    const handleDeleteProject = async () => {
+        try {
+            const response = await deleteProject(project.id);
+            if (response.code === 200) {
+                toast({
+                    title: '项目删除成功',
+                });
+                navigate('/project');
+            }
+        } catch (error) {
+            toast({
+                title: '项目删除失败',
+                description: error.message,
+                variant: 'destructive',
+            });
+        }
+    };
+
+    // 修改菜单项，根据权限显示不同选项
+    const menuItems = useMemo(() => {
+        const items = [
+            { id: 'info', icon: IconInfoCircle, label: '项目信息' },
+            { id: 'versions', icon: IconGitBranch, label: '版本管理' },
+        ];
+
+        // 只有管理员才能看到成员管理和项目设置
+        if (canManageMembers) {
+            items.push(
+                { id: 'members', icon: IconUsers, label: '成员管理' },
+                { id: 'settings', icon: IconSettings, label: '项目设置' }
+            );
+        }
+
+        return items;
+    }, [canManageMembers]);
 
     if (loading) return <div className="p-8">加载中...</div>;
     if (error) return <div className="p-8 text-red-500">{error}</div>;
@@ -321,7 +371,7 @@ const ProjectDetail = () => {
                     </div>
                 )}
 
-                {activeSection === 'members' && (
+                {activeSection === 'members' && canManageMembers && (
                     <Card>
                         <CardHeader>
                             <div className="flex justify-between items-center">
@@ -415,15 +465,8 @@ const ProjectDetail = () => {
                     </Card>
                 )}
 
-                {activeSection === 'settings' && (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>项目设置</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-gray-600">项目设置功能开发中</p>
-                        </CardContent>
-                    </Card>
+                {activeSection === 'settings' && canManageMembers && (
+                    <ProjectSettings project={project} onUpdate={handleUpdateProject} onDelete={handleDeleteProject} />
                 )}
             </div>
 
