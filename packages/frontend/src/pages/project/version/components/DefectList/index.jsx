@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { IconPlus } from '@tabler/icons-react';
 import DefectItem from './DefectItem';
 import CreateDefect from './CreateDefect';
 import EditDefect from './EditDefect';
+import { getProjectUsers } from '@/api/project';
+import { assignDefect } from '@/api/defect';
+import { useToast } from '@/hooks/use-toast';
 import {
     AlertDialog,
     AlertDialogContent,
@@ -15,12 +18,58 @@ import {
     AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 
-const DefectList = ({ defects, onStatusChange, onDelete, onCreate, onUpdate, versionId }) => {
+const DefectList = ({ defects, onStatusChange, onDelete, onCreate, onUpdate, versionId, projectId }) => {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [editingDefect, setEditingDefect] = useState(null);
     const [deletingDefect, setDeletingDefect] = useState(null);
+    const [members, setMembers] = useState([]);
+    const { toast } = useToast();
+
+    useEffect(() => {
+        fetchProjectMembers();
+    }, [projectId]);
+
+    const fetchProjectMembers = async () => {
+        try {
+            const response = await getProjectUsers(projectId);
+            if (response.code === 200) {
+                setMembers(response.data.members);
+            }
+        } catch (error) {
+            console.error('获取项目成员失败:', error);
+        }
+    };
+
+    const handleAssign = async (defectId, assigneeId) => {
+        try {
+            const response = await assignDefect(defectId, assigneeId);
+            if (response.code === 200) {
+                // 更新本地缺陷数据
+                const updatedDefects = defects.map((defect) =>
+                    defect.id === defectId
+                        ? {
+                              ...defect,
+                              assigneeId,
+                              assignee: members.find((m) => m.id === assigneeId),
+                              assignedAt: new Date().toISOString(),
+                          }
+                        : defect
+                );
+                onUpdate(updatedDefects);
+                toast({
+                    title: '指派成功',
+                });
+            }
+        } catch (error) {
+            toast({
+                title: '指派失败',
+                description: error.message,
+                variant: 'destructive',
+            });
+        }
+    };
 
     const handleEdit = (defect) => {
         setEditingDefect(defect);
@@ -50,6 +99,8 @@ const DefectList = ({ defects, onStatusChange, onDelete, onCreate, onUpdate, ver
                         onStatusChange={onStatusChange}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
+                        onAssign={handleAssign}
+                        members={members}
                     />
                 ))}
             </div>

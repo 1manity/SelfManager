@@ -229,6 +229,7 @@ const VersionDetail = () => {
                         onCreate={handleCreateRequirement}
                         onUpdate={handleUpdateRequirement}
                         versionId={versionId}
+                        projectId={projectId}
                     />
                 )}
 
@@ -240,6 +241,7 @@ const VersionDetail = () => {
                         onCreate={handleCreateDefect}
                         onUpdate={handleUpdateDefect}
                         versionId={versionId}
+                        projectId={projectId}
                     />
                 )}
             </div>

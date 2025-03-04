@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 export default function Dashboard() {
     return (
         <>
-            <div className="flex gap-2">
+            <div className="flex gap-2 p-6">
                 {[1, 2, 3].map((i) => (
                     <div
                         key={'first' + i}
@@ -11,7 +11,7 @@ export default function Dashboard() {
                     ></div>
                 ))}
             </div>
-            <div className="flex gap-2 flex-1">
+            <div className="flex gap-2 flex-1  p-6 pt-0">
                 {[1, 2].map((i) => (
                     <div
                         key={'second' + i}

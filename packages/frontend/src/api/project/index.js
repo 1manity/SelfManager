@@ -88,6 +88,7 @@ export const deleteProject = async (projectId) => {
 export const getProjectUsers = async (projectId) => {
     try {
         const response = await request.get(`/projects/${projectId}/users`);
+        console.log(response);
         return response;
     } catch (error) {
         console.error('获取项目用户失败:', error.message);
