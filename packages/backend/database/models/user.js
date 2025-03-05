@@ -89,15 +89,6 @@ module.exports = (sequelize, DataTypes) => {
     );
     // 关联任务：一个用户有多个任务
     User.associate = function (models) {
-        User.hasMany(models.Task, {
-            foreignKey: 'userId',
-            as: 'tasks', // 可以通过 `tasks` 访问该用户的所有任务
-        });
-        User.hasMany(models.TaskRule, {
-            foreignKey: 'userId',
-            as: 'taskRules', // 可以通过 `taskRules` 访问该用户的所有任务规则
-            onDelete: 'CASCADE',
-        });
         // 一个用户有多个项目（作为参与者）
         User.belongsToMany(models.Project, {
             through: {

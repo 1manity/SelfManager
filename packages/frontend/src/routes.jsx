@@ -1,7 +1,6 @@
 import Home from './pages/home/index.jsx';
 import Login from './pages/login/index.jsx';
 import Dashboard from './pages/dashboard/index.jsx';
-import Task from './pages/task/index.jsx';
 import Setting from './pages/setting/index.jsx';
 import Profile from './pages/setting/profile';
 import Layout from './components/layout/index.jsx';
@@ -22,7 +21,6 @@ function AppRoutes() {
             {/* 使用 Layout 作为父路由，嵌套其他路由 */}
             <Route path="/" element={<PrivateRoute element={<Layout />} />}>
                 <Route path="dashboard" element={<Dashboard />} />
-                <Route path="tasks" element={<Task />} />
                 <Route path="projects" element={<Project />} />
                 <Route path="project/detail/:id" element={<ProjectDetail />} />
                 <Route path="project/:projectId/version/:versionId" element={<VersionDetail />} />

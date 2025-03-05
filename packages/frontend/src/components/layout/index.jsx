@@ -48,11 +48,6 @@ const Layout = () => {
             icon: <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
         },
         {
-            label: '任务',
-            href: 'tasks',
-            icon: <IconChecklist className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
-        },
-        {
             label: '项目',
             href: '/projects',
             icon: <IconBorderAll className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />,
