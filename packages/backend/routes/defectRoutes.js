@@ -87,7 +87,6 @@ router.get('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-
 /**
  * 更新缺陷（需要是项目管理者）
  * @route PUT /api/defects/:id
