@@ -153,4 +153,42 @@ router.get('/:id/comments', authMiddleware, async (req, res) => {
     }
 });
 
+/**
+ * 删除需求评论
+ * @route DELETE /api/requirements/comments/:id
+ * @param {number} id - 评论ID
+ * @returns {object} 删除结果
+ */
+router.delete('/comments/:id', authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+    try {
+        const result = await RequirementService.deleteComment(id, userId);
+        res.json(ApiResponse.success('评论删除成功', result));
+    } catch (error) {
+        res.json(ApiResponse.error(error.message));
+    }
+});
+
+/**
+ * 指派需求
+ * @route PUT /api/requirements/:id/assign
+ * @param {number} id - 需求ID
+ * @body {object} body
+ * @body {number} body.assigneeId - 负责人ID
+ * @returns {object} 更新后的需求信息
+ */
+router.put('/:id/assign', authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    const { assigneeId } = req.body;
+    const userId = req.user.id;
+    try {
+        // 使用现有的 updateRequirement 方法，但只更新 assigneeId
+        const requirement = await RequirementService.updateRequirement(id, { assigneeId }, userId);
+        res.json(ApiResponse.success('需求指派成功', requirement));
+    } catch (error) {
+        res.json(ApiResponse.error(error.message + id + assigneeId));
+    }
+});
+
 module.exports = router;

@@ -44,25 +44,39 @@ const DefectList = ({ defects, onStatusChange, onDelete, onCreate, onUpdate, ver
 
     const handleAssign = async (defectId, assigneeId) => {
         try {
-            const response = await assignDefect(defectId, assigneeId);
+            if (!defectId) {
+                console.error('缺陷ID不能为空');
+                toast({
+                    title: '指派失败',
+                    description: '缺陷ID不能为空',
+                    variant: 'destructive',
+                });
+                return;
+            }
+
+            const response = await assignDefect(defectId, assigneeId === null ? null : assigneeId);
+
             if (response.code === 200) {
-                // 更新本地缺陷数据
                 const updatedDefects = defects.map((defect) =>
                     defect.id === defectId
                         ? {
                               ...defect,
-                              assigneeId,
-                              assignee: members.find((m) => m.id === assigneeId),
-                              assignedAt: new Date().toISOString(),
+                              assigneeId: assigneeId,
+                              assignee: assigneeId ? members.find((m) => m.id === assigneeId) : null,
+                              assignedAt: assigneeId ? new Date().toISOString() : null,
                           }
                         : defect
                 );
+
                 onUpdate(updatedDefects);
+
                 toast({
                     title: '指派成功',
+                    description: assigneeId ? '已成功指派缺陷' : '已取消指派',
                 });
             }
         } catch (error) {
+            console.error('指派缺陷失败:', error);
             toast({
                 title: '指派失败',
                 description: error.message,

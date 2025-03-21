@@ -246,6 +246,42 @@ const DefectService = {
 
         return comments;
     },
+
+    // 删除评论
+    async deleteComment(commentId, userId) {
+        const comment = await Comment.findByPk(commentId);
+        if (!comment) throw new Error('评论不存在');
+
+        if (comment.targetType !== 'defect') {
+            throw new Error('评论类型不匹配');
+        }
+
+        // 检查是否为评论作者
+        const isAuthor = comment.userId === userId;
+
+        if (!isAuthor) {
+            // 检查是否为项目管理员
+            const defect = await Defect.findByPk(comment.targetId);
+            if (!defect) throw new Error('缺陷不存在');
+
+            const version = await Version.findByPk(defect.versionId, {
+                include: [{ model: Project, as: 'project' }],
+            });
+
+            const projectUser = await ProjectUser.findOne({
+                where: {
+                    projectId: version.project.id,
+                    userId,
+                    role: ['creator', 'manager'],
+                },
+            });
+
+            if (!projectUser) throw new Error('没有权限删除此评论');
+        }
+
+        await comment.destroy();
+        return { message: '评论已删除' };
+    },
 };
 
 module.exports = DefectService;

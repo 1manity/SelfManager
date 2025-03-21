@@ -44,25 +44,46 @@ const RequirementList = ({ requirements, onStatusChange, onDelete, onCreate, onU
 
     const handleAssign = async (requirementId, assigneeId) => {
         try {
-            const response = await assignRequirement(requirementId, assigneeId);
+            if (!requirementId) {
+                console.error('需求ID不能为空');
+                toast({
+                    title: '指派失败',
+                    description: '需求ID不能为空',
+                    variant: 'destructive',
+                });
+                return;
+            }
+
+            // 修复：确保传递正确的参数格式
+            const response = await assignRequirement(requirementId, assigneeId === null ? null : assigneeId);
+
             if (response.code === 200) {
                 // 更新本地需求数据
-                const updatedRequirements = requirements.map((requirement) =>
-                    requirement.id === requirementId
-                        ? {
-                              ...requirement,
-                              assigneeId,
-                              assignee: members.find((m) => m.id === assigneeId),
-                              assignedAt: new Date().toISOString(),
-                          }
-                        : requirement
-                );
+                const updatedRequirements = requirements.map((requirement) => {
+                    if (requirement.id === requirementId) {
+                        // 找到要指派的成员对象
+                        const assignedMember = assigneeId ? members.find((m) => m.id === assigneeId) : null;
+
+                        return {
+                            ...requirement,
+                            assigneeId: assigneeId,
+                            assignee: assignedMember, // 确保设置了assignee对象
+                            assignedAt: assigneeId ? new Date().toISOString() : null,
+                        };
+                    }
+                    return requirement;
+                });
+
+                // 使用onUpdate回调更新父组件中的状态
                 onUpdate(updatedRequirements);
+
                 toast({
                     title: '指派成功',
+                    description: assigneeId ? '已成功指派需求' : '已取消指派',
                 });
             }
         } catch (error) {
+            console.error('指派需求失败:', error);
             toast({
                 title: '指派失败',
                 description: error.message,

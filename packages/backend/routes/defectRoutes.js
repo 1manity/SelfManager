@@ -168,4 +168,42 @@ router.get('/:id/comments', authMiddleware, async (req, res) => {
     }
 });
 
+/**
+ * 删除缺陷评论
+ * @route DELETE /api/defects/comments/:id
+ * @param {number} id - 评论ID
+ * @returns {object} 删除结果
+ */
+router.delete('/comments/:id', authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+    try {
+        const result = await DefectService.deleteComment(id, userId);
+        res.json(ApiResponse.success('评论删除成功', result));
+    } catch (error) {
+        res.json(ApiResponse.error(error.message));
+    }
+});
+
+/**
+ * 指派缺陷
+ * @route PUT /api/defects/:id/assign
+ * @param {number} id - 缺陷ID
+ * @body {object} body
+ * @body {number} body.assigneeId - 负责人ID
+ * @returns {object} 更新后的缺陷信息
+ */
+router.put('/:id/assign', authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    const { assigneeId } = req.body;
+    const userId = req.user.id;
+    try {
+        // 使用现有的 updateDefect 方法，但只更新 assigneeId
+        const defect = await DefectService.updateDefect(id, { assigneeId }, userId);
+        res.json(ApiResponse.success('缺陷指派成功', defect));
+    } catch (error) {
+        res.json(ApiResponse.error(error.message));
+    }
+});
+
 module.exports = router;

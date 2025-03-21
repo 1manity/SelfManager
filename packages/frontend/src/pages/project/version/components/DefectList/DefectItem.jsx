@@ -57,33 +57,19 @@ const DefectItem = ({ defect, onStatusChange, onEdit, onDelete, onAssign, member
                                 <div className="flex items-center gap-2">
                                     <Select
                                         value={assigneeValue}
-                                        onValueChange={(value) =>
-                                            onAssign(defect.id, value === 'unassigned' ? null : parseInt(value))
-                                        }
+                                        onValueChange={(value) => {
+                                            onAssign(defect.id, value === 'unassigned' ? null : parseInt(value));
+                                        }}
                                     >
-                                        <SelectTrigger className="w-[140px]">
-                                            <SelectValue>
-                                                {defect.assignee ? (
-                                                    <div className="flex items-center gap-2">
-                                                        <Avatar className="h-6 w-6">
-                                                            <AvatarImage src={defect.assignee.avatar} />
-                                                            <AvatarFallback>
-                                                                {defect.assignee.username[0]}
-                                                            </AvatarFallback>
-                                                        </Avatar>
-                                                        <span>{defect.assignee.username}</span>
-                                                    </div>
-                                                ) : (
-                                                    '未指派'
-                                                )}
-                                            </SelectValue>
+                                        <SelectTrigger className="w-[180px]">
+                                            <SelectValue placeholder="选择指派人" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="unassigned">未指派</SelectItem>
-                                            {members?.map((member) => (
+                                            {members.map((member) => (
                                                 <SelectItem key={member.id} value={member.id.toString()}>
-                                                    <div className="flex items-center gap-2">
-                                                        <Avatar className="h-6 w-6">
+                                                    <div className="flex items-center">
+                                                        <Avatar className="h-6 w-6 mr-2">
                                                             <AvatarImage src={member.avatar} />
                                                             <AvatarFallback>{member.username[0]}</AvatarFallback>
                                                         </Avatar>
@@ -99,7 +85,7 @@ const DefectItem = ({ defect, onStatusChange, onEdit, onDelete, onAssign, member
                                         onValueChange={(value) => onStatusChange(defect.id, value)}
                                     >
                                         <SelectTrigger className="w-[120px]">
-                                            <SelectValue />
+                                            <SelectValue placeholder="选择状态" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="open">待处理</SelectItem>

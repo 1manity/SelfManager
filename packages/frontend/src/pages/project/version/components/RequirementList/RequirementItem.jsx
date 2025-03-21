@@ -24,6 +24,16 @@ const statusColors = {
 const RequirementItem = ({ requirement, onStatusChange, onEdit, onDelete, onAssign, members }) => {
     const assigneeValue = requirement.assigneeId ? requirement.assigneeId.toString() : 'unassigned';
 
+    // 如果assignee不存在但assigneeId存在，尝试从members中找到对应的成员
+    const assignee =
+        requirement.assignee ||
+        (requirement.assigneeId && members ? members.find((m) => m.id === requirement.assigneeId) : null);
+
+    // 添加调试代码
+    console.log('requirement:', requirement);
+    console.log('assigneeValue:', assigneeValue);
+    console.log('requirement.assignee:', requirement.assignee);
+
     const formatDate = (dateString) => {
         try {
             return format(new Date(dateString), 'yyyy-MM-dd HH:mm');
@@ -45,14 +55,14 @@ const RequirementItem = ({ requirement, onStatusChange, onEdit, onDelete, onAssi
                                     <Badge className={statusColors[requirement.status]}>
                                         {requirement.status === 'pending' && '待开发'}
                                         {requirement.status === 'in_progress' && '开发中'}
-                                        {requirement.status === 'developed' && '已完成'}
+                                        {requirement.status === 'developed' && '已开发'}
                                         {requirement.status === 'testing' && '测试中'}
-                                        {requirement.status === 'completed' && '已上线'}
+                                        {requirement.status === 'completed' && '已完成'}
                                     </Badge>
                                     <Badge className={priorityColors[requirement.priority]}>
-                                        {requirement.priority === 'low' && '低优先级'}
-                                        {requirement.priority === 'medium' && '中优先级'}
-                                        {requirement.priority === 'high' && '高优先级'}
+                                        {requirement.priority === 'low' && '低'}
+                                        {requirement.priority === 'medium' && '中'}
+                                        {requirement.priority === 'high' && '高'}
                                     </Badge>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -69,15 +79,13 @@ const RequirementItem = ({ requirement, onStatusChange, onEdit, onDelete, onAssi
                                     >
                                         <SelectTrigger className="w-[140px]">
                                             <SelectValue>
-                                                {requirement.assignee ? (
+                                                {assignee ? (
                                                     <div className="flex items-center gap-2">
                                                         <Avatar className="h-6 w-6">
-                                                            <AvatarImage src={requirement.assignee.avatar} />
-                                                            <AvatarFallback>
-                                                                {requirement.assignee.username[0]}
-                                                            </AvatarFallback>
+                                                            <AvatarImage src={assignee.avatar} />
+                                                            <AvatarFallback>{assignee.username[0]}</AvatarFallback>
                                                         </Avatar>
-                                                        <span>{requirement.assignee.username}</span>
+                                                        <span>{assignee.username}</span>
                                                     </div>
                                                 ) : (
                                                     '未指派'
@@ -115,9 +123,9 @@ const RequirementItem = ({ requirement, onStatusChange, onEdit, onDelete, onAssi
                                         <SelectContent>
                                             <SelectItem value="pending">待开发</SelectItem>
                                             <SelectItem value="in_progress">开发中</SelectItem>
-                                            <SelectItem value="developed">已完成</SelectItem>
+                                            <SelectItem value="developed">已开发</SelectItem>
                                             <SelectItem value="testing">测试中</SelectItem>
-                                            <SelectItem value="completed">已上线</SelectItem>
+                                            <SelectItem value="completed">已完成</SelectItem>
                                         </SelectContent>
                                     </Select>
 
