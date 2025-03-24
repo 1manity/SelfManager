@@ -10,7 +10,7 @@ const NotificationService = {
     // 获取用户的通知
     async getUserNotifications(userId, options = {}) {
         const { limit = 20, offset = 0, unreadOnly = false } = options;
-        
+
         const query = {
             where: {
                 receiverId: userId,
@@ -27,15 +27,20 @@ const NotificationService = {
                     as: 'project',
                     attributes: ['id', 'name'],
                 },
+                {
+                    model: Version,
+                    as: 'version',
+                    attributes: ['id', 'versionNumber'],
+                },
             ],
             order: [['createdAt', 'DESC']],
             limit,
             offset,
         };
-        
+
         const notifications = await Notification.findAll(query);
         const total = await Notification.count({ where: query.where });
-        
+
         return { notifications, total };
     },
 
@@ -57,11 +62,11 @@ const NotificationService = {
                 receiverId: userId,
             },
         });
-        
+
         if (!notification) {
             throw new Error('通知不存在或无权限访问');
         }
-        
+
         await notification.update({ isRead: true });
         return notification;
     },
@@ -77,7 +82,7 @@ const NotificationService = {
                 },
             }
         );
-        
+
         return { success: true };
     },
 
@@ -89,11 +94,11 @@ const NotificationService = {
                 receiverId: userId,
             },
         });
-        
+
         if (!notification) {
             throw new Error('通知不存在或无权限访问');
         }
-        
+
         await notification.destroy();
         return { success: true };
     },
@@ -104,17 +109,17 @@ const NotificationService = {
         const version = await Version.findByPk(requirement.versionId, {
             include: [{ model: Project, as: 'project' }],
         });
-        
+
         if (!version || !version.project) {
             throw new Error('找不到相关版本或项目');
         }
-        
+
         // 获取指派者信息
         const assigner = await User.findByPk(assignerId);
         if (!assigner) {
             throw new Error('找不到指派者信息');
         }
-        
+
         // 创建通知
         return await this.createNotification({
             receiverId: requirement.assigneeId,
@@ -124,6 +129,7 @@ const NotificationService = {
             resourceType: 'requirement',
             resourceId: requirement.id,
             projectId: version.project.id,
+            versionId: requirement.versionId,
         });
     },
 
@@ -133,17 +139,17 @@ const NotificationService = {
         const version = await Version.findByPk(defect.versionId, {
             include: [{ model: Project, as: 'project' }],
         });
-        
+
         if (!version || !version.project) {
             throw new Error('找不到相关版本或项目');
         }
-        
+
         // 获取指派者信息
         const assigner = await User.findByPk(assignerId);
         if (!assigner) {
             throw new Error('找不到指派者信息');
         }
-        
+
         // 创建通知
         return await this.createNotification({
             receiverId: defect.assigneeId,
@@ -153,8 +159,9 @@ const NotificationService = {
             resourceType: 'defect',
             resourceId: defect.id,
             projectId: version.project.id,
+            versionId: defect.versionId,
         });
     },
 };
 
-module.exports = NotificationService; 
+module.exports = NotificationService;

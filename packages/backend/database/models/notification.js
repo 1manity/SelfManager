@@ -22,6 +22,12 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'projectId',
                 as: 'project',
             });
+
+            // 通知关联到版本
+            Notification.belongsTo(models.Version, {
+                foreignKey: 'versionId',
+                as: 'version',
+            });
         }
     }
 
@@ -64,6 +70,14 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 references: {
                     model: 'Projects',
+                    key: 'id',
+                },
+            },
+            versionId: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+                references: {
+                    model: 'Versions',
                     key: 'id',
                 },
             },

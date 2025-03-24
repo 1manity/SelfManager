@@ -181,8 +181,6 @@ const RequirementService = {
 
         await requirement.update(updates);
 
-        console.log('DEBUG 更新需求 updates', updates.assigneeId);
-        console.log('DEBUG 更新需求 requirement', requirement.assigneeId);
         // 如果更新了指派人，且指派人不为空，则创建通知
         if (updates.assigneeId && updates.assigneeId !== null) {
             try {
