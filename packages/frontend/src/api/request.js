@@ -25,6 +25,11 @@ request.interceptors.request.use(
 // 响应拦截器
 request.interceptors.response.use(
     (response) => {
+        // 如果是blob类型的响应，直接返回
+        if (response.config.responseType === 'blob') {
+            return response;
+        }
+
         const { code, message, data } = response.data;
 
         // 统一处理成功响应

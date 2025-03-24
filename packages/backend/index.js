@@ -12,6 +12,7 @@ const versionRoutes = require('./routes/versionRoutes');
 const requirementRoutes = require('./routes/requirementRoutes');
 const defectRoutes = require('./routes/defectRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const projectFileRoutes = require('./routes/projectFileRoutes');
 
 const ApiResponse = require('./utils/ApiResponse'); // 引入 ApiResponse 类
 
@@ -34,6 +35,8 @@ app.use('/requirements', requirementRoutes);
 app.use('/defects', defectRoutes);
 // 注册路由
 app.use('/dashboard', dashboardRoutes);
+// 文件路由
+app.use('/projects', projectFileRoutes);
 
 // 全局错误处理（可选）
 app.use((err, req, res, next) => {

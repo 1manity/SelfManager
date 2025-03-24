@@ -8,6 +8,11 @@ import Project from './pages/project/index.jsx';
 import ProjectDetail from './pages/project/detail/index.jsx';
 import VersionDetail from './pages/project/version/index.jsx';
 import Users from './pages/admin/users/index.jsx';
+import ProjectInfo from './pages/project/detail/tabs/ProjectInfo.jsx';
+import ProjectVersions from './pages/project/detail/tabs/ProjectVersions.jsx';
+import ProjectMembers from './pages/project/detail/tabs/ProjectMembers.jsx';
+import ProjectFiles from './pages/project/detail/tabs/ProjectFiles.jsx';
+import ProjectSettings from './pages/project/detail/tabs/ProjectSettings.jsx';
 
 import { Route, Routes } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
@@ -22,7 +27,14 @@ function AppRoutes() {
             <Route path="/" element={<PrivateRoute element={<Layout />} />}>
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="projects" element={<Project />} />
-                <Route path="project/detail/:id" element={<ProjectDetail />} />
+                <Route path="project/detail/:id" element={<ProjectDetail />}>
+                    <Route path="" element={<Navigate to="info" />} />
+                    <Route path="info" element={<ProjectInfo />} />
+                    <Route path="versions" element={<ProjectVersions />} />
+                    <Route path="members" element={<ProjectMembers />} />
+                    <Route path="files" element={<ProjectFiles />} />
+                    <Route path="settings" element={<ProjectSettings />} />
+                </Route>
                 <Route path="project/:projectId/version/:versionId" element={<VersionDetail />} />
                 <Route path="users" element={<Users />} />
                 <Route path="setting" element={<Setting />}>
