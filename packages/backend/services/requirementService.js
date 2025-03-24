@@ -143,46 +143,81 @@ const RequirementService = {
 
     // 更新需求
     async updateRequirement(requirementId, updates, userId) {
-        const requirement = await Requirement.findByPk(requirementId);
-        if (!requirement) throw new Error('需求未找到');
-
-        const version = await Version.findByPk(requirement.versionId, {
-            include: [{ model: Project, as: 'project' }],
+        const requirement = await Requirement.findByPk(requirementId, {
+            include: [
+                {
+                    model: Version,
+                    as: 'version',
+                    include: [
+                        {
+                            model: Project,
+                            as: 'project',
+                        },
+                    ],
+                },
+            ],
         });
 
-        // 检查是否为项目管理者
-        const projectUser = await ProjectUser.findOne({
-            where: {
-                projectId: version.project.id,
-                userId,
-                role: ['creator', 'manager'],
-            },
-        });
+        if (!requirement) {
+            throw new Error('需求不存在');
+        }
 
-        if (!projectUser) throw new Error('只有项目管理者可以更新需求');
+        // 检查用户是否有权限更新需求
+        await this.checkPermission(requirement.version.project.id, userId);
 
-        // 如果更新了负责人，先验证用户是否存在
+        // 如果更新了指派人，检查指派人是否为项目成员
         if (updates.assigneeId) {
-            const assignee = await User.findByPk(updates.assigneeId);
-            if (!assignee) {
-                throw new Error('指定的负责人不存在');
-            }
-            if (updates.assigneeId !== requirement.assigneeId) {
-                updates.assignedAt = new Date();
-            }
-        }
+            const isProjectMember = await ProjectUser.findOne({
+                where: {
+                    projectId: requirement.version.project.id,
+                    userId: updates.assigneeId,
+                },
+            });
 
-        // 如果状态变更为进行中且没有开始时间，记录开始时间
-        if (updates.status === 'in_progress' && !requirement.startedAt) {
-            updates.startedAt = new Date();
-        }
-
-        // 如果状态变更为已完成且没有完成时间，记录完成时间
-        if (updates.status === 'completed' && !requirement.completedAt) {
-            updates.completedAt = new Date();
+            if (!isProjectMember) {
+                throw new Error('指派的用户不是项目成员');
+            }
         }
 
         await requirement.update(updates);
+
+        console.log('DEBUG 更新需求 updates', updates.assigneeId);
+        console.log('DEBUG 更新需求 requirement', requirement.assigneeId);
+        // 如果更新了指派人，且指派人不为空，则创建通知
+        if (updates.assigneeId && updates.assigneeId !== null) {
+            try {
+                console.log('需求指派变更:', {
+                    requirementId: requirement.id,
+                    oldAssigneeId: requirement.assigneeId,
+                    newAssigneeId: updates.assigneeId,
+                    updatedBy: userId,
+                });
+
+                // 先更新 requirement 对象的 assigneeId，确保通知服务能获取到最新值
+                requirement.assigneeId = updates.assigneeId;
+
+                const notificationService = require('./notificationService');
+                await notificationService.createRequirementAssignedNotification(requirement, userId);
+
+                // 如果用户在线，发送实时通知
+                const { sendNotificationToUser } = require('../socket');
+                const io = require('../index').io;
+                if (io) {
+                    sendNotificationToUser(io, updates.assigneeId, {
+                        type: 'requirement_assigned',
+                        requirementId: requirement.id,
+                        projectId: requirement.version.project.id,
+                        versionId: requirement.versionId,
+                        title: requirement.title,
+                        message: `您被指派了一个新需求: ${requirement.title}`,
+                    });
+                }
+            } catch (error) {
+                console.error('发送需求指派通知失败:', error);
+                // 通知失败不影响主流程
+            }
+        }
+
         return requirement;
     },
 

@@ -177,6 +177,31 @@ const DefectService = {
         }
 
         await defect.update(updates);
+        // 如果更新了指派人，且指派人不为空，则创建通知
+        if (updates.assigneeId && updates.assigneeId !== null) {
+            try {
+                const notificationService = require('./notificationService');
+                await notificationService.createDefectAssignedNotification(defect, userId);
+
+                // 如果用户在线，发送实时通知
+                const { sendNotificationToUser } = require('../socket');
+                const io = require('../index').io;
+                if (io) {
+                    sendNotificationToUser(io, updates.assigneeId, {
+                        type: 'defect_assigned',
+                        defectId: defect.id,
+                        projectId: defect.version.project.id,
+                        versionId: defect.versionId,
+                        title: defect.title,
+                        message: `您被指派了一个新缺陷: ${defect.title}`,
+                    });
+                }
+            } catch (error) {
+                console.error('发送通知失败:', error);
+                // 通知失败不影响主流程
+            }
+        }
+
         return defect;
     },
 

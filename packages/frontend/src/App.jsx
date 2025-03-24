@@ -1,10 +1,15 @@
 import './App.css';
 import AppRoutes from './routes';
+import { NotificationProvider } from './contexts/NotificationContext';
+import FloatingNotificationBell from './components/FloatingNotificationBell';
 
 function App() {
     return (
         <div className={'min-h-screen'}>
-            <AppRoutes></AppRoutes>
+            <NotificationProvider>
+                <FloatingNotificationBell />
+                <AppRoutes />
+            </NotificationProvider>
         </div>
     );
 }
