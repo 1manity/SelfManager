@@ -16,7 +16,7 @@ import { useEffect } from 'react';
 import { setUser } from '@/store/user'; // 确保路径正确
 
 import { whoami } from '@/api/user';
-
+import FloatingNotificationBell from '@/components/FloatingNotificationBell';
 const Layout = () => {
     const user = useSelector((state) => state.user.user);
     const dispatch = useDispatch();
@@ -122,6 +122,7 @@ const Layout = () => {
             </Sidebar>
             <div className="flex flex-1">
                 <div className="rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
+                    <FloatingNotificationBell />
                     <Outlet></Outlet>
                 </div>
             </div>
