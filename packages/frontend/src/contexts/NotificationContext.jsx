@@ -17,7 +17,7 @@ export const NotificationProvider = ({ children }) => {
 
     // 初始化 Socket 连接
     useEffect(() => {
-        if (user) {
+        if (user.id !== null) {
             const socket = initSocket();
             // 监听通知事件
             if (socket) {
