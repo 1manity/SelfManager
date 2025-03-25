@@ -224,13 +224,13 @@ const ProjectPage = () => {
     };
 
     return (
-        <div className="px-12 pt-8 bg-neutral-100 h-screen">
+        <div className="px-12 pt-8 bg-neutral-50 min-h-screen">
             <div className="mb-6 flex justify-between items-center">
-                <h1 className="scroll-m-20 text-2xl font-thin tracking-tight mb-4">项目</h1>
+                <h1 className="scroll-m-20 text-2xl font-semibold tracking-tight mb-4">项目</h1>
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button>
-                            <IconPlus className="h-4 w-4" /> 新建项目
+                        <Button className="bg-primary hover:bg-primary/90">
+                            <IconPlus className="h-4 w-4 mr-2" /> 新建项目
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
@@ -264,15 +264,17 @@ const ProjectPage = () => {
                 </Dialog>
             </div>
             {loading ? (
-                <div>项目加载中...</div>
+                <div className="flex justify-center items-center h-64">
+                    <div className="text-primary">项目加载中...</div>
+                </div>
             ) : error ? (
-                <div className="text-red-500">{error}</div>
+                <div className="text-red-500 p-4 rounded-md bg-red-50 border border-red-200">{error}</div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {projects.map((project) => (
                         <Card
                             key={project.id}
-                            className="cursor-pointer hover:shadow-md transition-shadow"
+                            className="cursor-pointer hover:shadow-md transition-shadow border border-neutral-200 overflow-hidden"
                             onClick={(e) => {
                                 // 检查是否点击了下拉菜单内容
                                 const isDropdownClick = e.target.closest('[role="menuitem"]');
@@ -284,11 +286,13 @@ const ProjectPage = () => {
                                 }
                             }}
                         >
-                            <CardContent className="pl-6 pt-5 flex flex-col justify-between">
-                                <div className="space-y-1 flex items-center justify-between w-full">
+                            <CardContent className="p-6 flex flex-col justify-between h-full">
+                                <div className="space-y-1 flex items-center justify-between w-full mb-3">
                                     <div className="flex flex-col">
-                                        <h2 className="font-semibold text-sm truncate">{project.name}</h2>
-                                        <div className="text-xs text-gray-400 truncate">{project.status}</div>
+                                        <h2 className="font-semibold text-base truncate">{project.name}</h2>
+                                        <div className="text-xs text-gray-500 truncate capitalize">
+                                            {project.status === 'planning' ? '规划中' : project.status}
+                                        </div>
                                     </div>
 
                                     <div className="flex items-center space-x-2 project-actions">
@@ -318,13 +322,15 @@ const ProjectPage = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-start my-3">
-                                    <div className="inline-flex items-center px-4 h-6 bg-gray-200 rounded-full font-medium text-sm">
+                                    <div className="inline-flex items-center px-3 py-1 bg-neutral-100 rounded-full font-medium text-xs text-neutral-600">
                                         无关联仓库
                                     </div>
                                 </div>
 
-                                <p className="text-sm text-gray-500 truncate">{project.description}</p>
-                                <div className="text-xs text-gray-400 truncate">
+                                <p className="text-sm text-gray-600 line-clamp-2 mb-3 min-h-[40px]">
+                                    {project.description || '暂无描述'}
+                                </p>
+                                <div className="text-xs text-gray-400 mt-auto">
                                     {project.startDate && `上次修改: ${format(new Date(project.updatedAt), 'PP')}`}
                                 </div>
                             </CardContent>

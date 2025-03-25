@@ -13,6 +13,11 @@ import ProjectVersions from './pages/project/detail/tabs/ProjectVersions.jsx';
 import ProjectMembers from './pages/project/detail/tabs/ProjectMembers.jsx';
 import ProjectFiles from './pages/project/detail/tabs/ProjectFiles.jsx';
 import ProjectSettings from './pages/project/detail/tabs/ProjectSettings.jsx';
+import VersionInfo from './pages/project/version/tabs/VersionInfo';
+import RequirementTab from './pages/project/version/tabs/RequirementTab';
+import DefectTab from './pages/project/version/tabs/DefectTab';
+import MyTasksTab from './pages/project/version/tabs/MyTasksTab';
+import VersionSettings from './pages/project/version/tabs/VersionSettings';
 
 import { Route, Routes } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
@@ -35,7 +40,14 @@ function AppRoutes() {
                     <Route path="files" element={<ProjectFiles />} />
                     <Route path="settings" element={<ProjectSettings />} />
                 </Route>
-                <Route path="project/:projectId/version/:versionId" element={<VersionDetail />} />
+                <Route path="project/:projectId/version/:versionId" element={<VersionDetail />}>
+                    <Route path="" element={<Navigate to="info" />} />
+                    <Route path="info" element={<VersionInfo />} />
+                    <Route path="requirements" element={<RequirementTab />} />
+                    <Route path="defects" element={<DefectTab />} />
+                    <Route path="my-tasks" element={<MyTasksTab />} />
+                    <Route path="settings" element={<VersionSettings />} />
+                </Route>
                 <Route path="users" element={<Users />} />
                 <Route path="setting" element={<Setting />}>
                     <Route path="" element={<Profile />}></Route>
