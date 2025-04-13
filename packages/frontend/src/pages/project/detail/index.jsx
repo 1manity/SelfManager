@@ -11,6 +11,13 @@ import {
     IconSettings,
     IconGitBranch,
     IconFolder,
+    IconCalendar,
+    IconFileDescription,
+    IconClockHour4,
+    IconUserCircle,
+    IconChevronRight,
+    IconAlertCircle,
+    IconEdit,
 } from '@tabler/icons-react';
 import { format } from 'date-fns';
 import {
@@ -41,6 +48,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useSelector } from 'react-redux';
 import { updateProject, deleteProject } from '@/api/project';
+import { Badge } from '@/components/ui/badge';
 
 // 导入子页面组件
 import ProjectInfo from './tabs/ProjectInfo';
@@ -48,6 +56,14 @@ import ProjectVersions from './tabs/ProjectVersions';
 import ProjectMembers from './tabs/ProjectMembers';
 import ProjectSettings from './tabs/ProjectSettings';
 import ProjectFiles from './tabs/ProjectFiles';
+
+// 项目状态映射
+const projectStatusMap = {
+    planning: { label: '规划中', color: 'bg-blue-100 text-blue-800' },
+    in_progress: { label: '进行中', color: 'bg-yellow-100 text-yellow-800' },
+    completed: { label: '已完成', color: 'bg-green-100 text-green-800' },
+    suspended: { label: '已暂停', color: 'bg-gray-100 text-gray-800' },
+};
 
 const ProjectDetail = () => {
     const { id } = useParams();
@@ -244,122 +260,137 @@ const ProjectDetail = () => {
         return items;
     }, [canManageMembers]);
 
-    if (loading) return <div className="p-8">加载中...</div>;
-    if (error) return <div className="p-8 text-red-500">{error}</div>;
-    if (!project) return <div className="p-8">项目不存在</div>;
+    if (loading)
+        return (
+            <div className="flex items-center justify-center h-[calc(100vh-200px)]">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    if (error)
+        return (
+            <div className="p-8 text-red-500 flex items-center justify-center">
+                <IconAlertCircle className="h-6 w-6 mr-2" />
+                <span>{error}</span>
+            </div>
+        );
+    if (!project)
+        return (
+            <div className="p-8 flex items-center justify-center">
+                <IconAlertCircle className="h-6 w-6 mr-2" />
+                <span>项目不存在</span>
+            </div>
+        );
 
     return (
-        <div className="container mx-auto py-6 space-y-6">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm" onClick={() => navigate('/projects')}>
-                        <IconArrowLeft className="h-4 w-4 mr-1" />
-                        返回项目列表
-                    </Button>
-                    <h1 className="text-2xl font-bold">{project.name}</h1>
-                </div>
-            </div>
-
-            <div className="flex border-b">
-                <Link
-                    to={`/project/detail/${id}`}
-                    className={`px-4 py-2 font-medium ${
-                        currentTab === 'info'
-                            ? 'border-b-2 border-primary text-primary'
-                            : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                >
-                    <div className="flex items-center">
-                        <IconInfoCircle className="h-4 w-4 mr-2" />
-                        项目概览
-                    </div>
-                </Link>
-                <Link
-                    to={`/project/detail/${id}/versions`}
-                    className={`px-4 py-2 font-medium ${
-                        currentTab === 'versions'
-                            ? 'border-b-2 border-primary text-primary'
-                            : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                >
-                    <div className="flex items-center">
-                        <IconGitBranch className="h-4 w-4 mr-2" />
-                        版本管理
-                    </div>
-                </Link>
-                <Link
-                    to={`/project/detail/${id}/members`}
-                    className={`px-4 py-2 font-medium ${
-                        currentTab === 'members'
-                            ? 'border-b-2 border-primary text-primary'
-                            : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                >
-                    <div className="flex items-center">
-                        <IconUsers className="h-4 w-4 mr-2" />
-                        成员管理
-                    </div>
-                </Link>
-                <Link
-                    to={`/project/detail/${id}/files`}
-                    className={`px-4 py-2 font-medium ${
-                        currentTab === 'files'
-                            ? 'border-b-2 border-primary text-primary'
-                            : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                >
-                    <div className="flex items-center">
-                        <IconFolder className="h-4 w-4 mr-2" />
-                        文件管理
-                    </div>
-                </Link>
-                {canManageMembers && (
-                    <Link
-                        to={`/project/detail/${id}/settings`}
-                        className={`px-4 py-2 font-medium ${
-                            currentTab === 'settings'
-                                ? 'border-b-2 border-primary text-primary'
-                                : 'text-gray-500 hover:text-gray-700'
-                        }`}
-                    >
-                        <div className="flex items-center">
-                            <IconSettings className="h-4 w-4 mr-2" />
-                            项目设置
+        <div className="flex flex-col h-full">
+            <div className="container mx-auto py-4 flex flex-col h-full">
+                <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex items-center space-x-4">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => navigate('/projects')}
+                                className="hover:bg-gray-100"
+                            >
+                                <IconArrowLeft className="h-4 w-4 mr-1" />
+                                返回
+                            </Button>
+                            <div>
+                                <h1 className="text-2xl font-bold flex items-center">
+                                    {project.name}
+                                    <Badge
+                                        className={`ml-3 ${projectStatusMap[project.status]?.color || 'bg-gray-100'}`}
+                                    >
+                                        {projectStatusMap[project.status]?.label || project.status}
+                                    </Badge>
+                                </h1>
+                                <div className="text-sm text-gray-500 flex flex-wrap gap-4 mt-1">
+                                    <span className="flex items-center">
+                                        <IconCalendar className="h-4 w-4 mr-1 text-gray-400" />
+                                        创建于: {format(new Date(project.createdAt), 'yyyy-MM-dd')}
+                                    </span>
+                                    <span className="flex items-center">
+                                        <IconUserCircle className="h-4 w-4 mr-1 text-gray-400" />
+                                        创建者: {project.creator.username}
+                                    </span>
+                                    <span className="flex items-center">
+                                        <IconClockHour4 className="h-4 w-4 mr-1 text-gray-400" />
+                                        最近更新: {format(new Date(project.updatedAt), 'yyyy-MM-dd')}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                    </Link>
-                )}
-            </div>
+                        {canManageMembers && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="flex items-center text-blue-600 border-blue-300 hover:bg-blue-50"
+                                onClick={() => navigate(`/project/detail/${id}/settings`)}
+                            >
+                                <IconEdit className="h-4 w-4 mr-2" />
+                                编辑项目
+                            </Button>
+                        )}
+                    </div>
+                </div>
 
-            <div className="p-4 overflow-auto max-h-[calc(100vh-200px)]">
-                {currentTab === 'info' && <ProjectInfo project={project} />}
-                {currentTab === 'versions' && (
-                    <ProjectVersions project={project} onCreateVersion={() => setIsAddVersionOpen(true)} />
-                )}
-                {currentTab === 'members' && (
-                    <ProjectMembers
-                        project={project}
-                        canManageMembers={canManageMembers}
-                        onAddMember={() => {
-                            fetchAvailableUsers();
-                            setIsAddMemberOpen(true);
-                        }}
-                        onRemoveMember={(userId) => {
-                            setRemovingUserId(userId);
-                            setIsRemoveMemberOpen(true);
-                        }}
-                    />
-                )}
-                {currentTab === 'files' && <ProjectFiles project={project} />}
-                {currentTab === 'settings' && (
-                    <ProjectSettings project={project} onProjectUpdate={handleUpdateProject} />
-                )}
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden flex-1 flex flex-col">
+                    <div className="flex overflow-x-auto border-b">
+                        {menuItems.map((item) => (
+                            <Link
+                                key={item.id}
+                                to={item.id === 'info' ? `/project/detail/${id}` : `/project/detail/${id}/${item.id}`}
+                                className={`px-4 py-3 font-medium transition-colors flex-shrink-0 ${
+                                    currentTab === item.id
+                                        ? 'border-b-2 border-blue-500 text-blue-600 bg-blue-50'
+                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                }`}
+                            >
+                                <div className="flex items-center">
+                                    <item.icon className="h-4 w-4 mr-2" />
+                                    {item.label}
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+
+                    <div className="p-6 overflow-auto flex-1 bg-gray-50/50">
+                        {currentTab === 'info' && <ProjectInfo project={project} />}
+                        {currentTab === 'versions' && (
+                            <ProjectVersions project={project} onCreateVersion={() => setIsAddVersionOpen(true)} />
+                        )}
+                        {currentTab === 'members' && (
+                            <ProjectMembers
+                                project={project}
+                                canManageMembers={canManageMembers}
+                                onAddMember={() => {
+                                    fetchAvailableUsers();
+                                    setIsAddMemberOpen(true);
+                                }}
+                                onRemoveMember={(userId) => {
+                                    setRemovingUserId(userId);
+                                    setIsRemoveMemberOpen(true);
+                                }}
+                            />
+                        )}
+                        {currentTab === 'files' && <ProjectFiles project={project} />}
+                        {currentTab === 'settings' && (
+                            <ProjectSettings project={project} onProjectUpdate={handleUpdateProject} />
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* 创建版本对话框 */}
             <Dialog open={isAddVersionOpen} onOpenChange={setIsAddVersionOpen}>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
-                        <DialogTitle>创建新版本</DialogTitle>
+                        <DialogTitle className="flex items-center text-xl">
+                            <IconGitBranch className="h-5 w-5 mr-2 text-blue-500" />
+                            创建新版本
+                        </DialogTitle>
+                        <DialogDescription>为项目 "{project.name}" 添加新的版本</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleCreateVersion} className="space-y-4">
                         <div>
@@ -370,6 +401,7 @@ const ProjectDetail = () => {
                                 onChange={(e) => setNewVersion({ ...newVersion, versionNumber: e.target.value })}
                                 placeholder="例如：v1.0.0"
                                 required
+                                className="mt-1"
                             />
                         </div>
                         <div>
@@ -380,6 +412,7 @@ const ProjectDetail = () => {
                                 onChange={(e) => setNewVersion({ ...newVersion, description: e.target.value })}
                                 placeholder="版本描述..."
                                 rows={3}
+                                className="mt-1"
                             />
                         </div>
                         <div>
@@ -390,6 +423,7 @@ const ProjectDetail = () => {
                                 value={newVersion.releaseDate}
                                 onChange={(e) => setNewVersion({ ...newVersion, releaseDate: e.target.value })}
                                 required
+                                className="mt-1"
                             />
                         </div>
                         <div>
@@ -398,7 +432,7 @@ const ProjectDetail = () => {
                                 value={newVersion.status}
                                 onValueChange={(value) => setNewVersion({ ...newVersion, status: value })}
                             >
-                                <SelectTrigger>
+                                <SelectTrigger className="mt-1">
                                     <SelectValue placeholder="选择状态" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -409,11 +443,13 @@ const ProjectDetail = () => {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <DialogFooter>
+                        <DialogFooter className="mt-6">
                             <Button type="button" variant="outline" onClick={() => setIsAddVersionOpen(false)}>
                                 取消
                             </Button>
-                            <Button type="submit">创建</Button>
+                            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                                创建
+                            </Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -421,15 +457,19 @@ const ProjectDetail = () => {
 
             {/* 添加成员对话框 */}
             <Dialog open={isAddMemberOpen} onOpenChange={setIsAddMemberOpen}>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
-                        <DialogTitle>添加项目成员</DialogTitle>
+                        <DialogTitle className="flex items-center text-xl">
+                            <IconUsers className="h-5 w-5 mr-2 text-blue-500" />
+                            添加项目成员
+                        </DialogTitle>
+                        <DialogDescription>邀请用户加入 "{project.name}" 项目</DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4">
+                    <div className="space-y-4 py-2">
                         <div className="space-y-2">
                             <Label htmlFor="user">选择用户</Label>
                             <Select onValueChange={(value) => setSelectedUserId(parseInt(value))}>
-                                <SelectTrigger>
+                                <SelectTrigger className="mt-1">
                                     <SelectValue placeholder="选择用户" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -444,7 +484,7 @@ const ProjectDetail = () => {
                         <div className="space-y-2">
                             <Label htmlFor="role">选择角色</Label>
                             <Select defaultValue="member" onValueChange={setSelectedRole}>
-                                <SelectTrigger>
+                                <SelectTrigger className="mt-1">
                                     <SelectValue placeholder="选择角色" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -454,11 +494,13 @@ const ProjectDetail = () => {
                             </Select>
                         </div>
                     </div>
-                    <DialogFooter>
+                    <DialogFooter className="mt-6">
                         <Button variant="outline" onClick={() => setIsAddMemberOpen(false)}>
                             取消
                         </Button>
-                        <Button onClick={handleAddMember}>添加</Button>
+                        <Button onClick={handleAddMember} className="bg-blue-600 hover:bg-blue-700">
+                            添加
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -467,12 +509,19 @@ const ProjectDetail = () => {
             <AlertDialog open={isRemoveMemberOpen} onOpenChange={setIsRemoveMemberOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>确认移除</AlertDialogTitle>
-                        <AlertDialogDescription>确定要移除该成员吗？此操作无法撤销。</AlertDialogDescription>
+                        <AlertDialogTitle className="flex items-center">
+                            <IconUsers className="h-5 w-5 mr-2 text-red-500" />
+                            确认移除成员
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            确定要移除该成员吗？此操作无法撤销，移除后该成员将无法访问此项目。
+                        </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
+                    <AlertDialogFooter className="mt-4">
                         <AlertDialogCancel>取消</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleRemoveMember}>确认移除</AlertDialogAction>
+                        <AlertDialogAction onClick={handleRemoveMember} className="bg-red-600 hover:bg-red-700">
+                            确认移除
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

@@ -87,7 +87,7 @@ const Layout = () => {
     return (
         <div
             className={cn(
-                'rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full flex-1 border border-neutral-200 dark:border-neutral-700 overflow-hidden',
+                'rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full flex-1 border border-neutral-200 dark:border-neutral-700',
                 'h-screen' // for your use case, use `h-screen` instead of `h-[60vh]` max-w-7xl mx-auto
             )}
         >
@@ -120,8 +120,8 @@ const Layout = () => {
                     </div>
                 </SidebarBody>
             </Sidebar>
-            <div className="flex flex-1">
-                <div className="rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
+            <div className="flex flex-1 overflow-hidden">
+                <div className="rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full overflow-auto">
                     <FloatingNotificationBell />
                     <Outlet></Outlet>
                 </div>
